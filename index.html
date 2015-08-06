@@ -1,0 +1,384 @@
+<html>
+
+<head>
+    <title> Cyberhawk 2015</title>
+</head>
+<!-- body -->
+
+<body>
+</body>
+<!-- script -->
+<script src="js/three.js"></script>
+<script src="js/three.css3drenderer.js"></script>
+<!--script src="js/tweenjs.js"></script-->
+<script src="js/jquery.js"></script>
+<script src="js/tween-lib.js"></script>
+<script src="bower_components/webcomponentsjs/webcomponents-lite.min.js"></script>
+<link rel="import" href="bower_components/paper-button/paper-button.html">
+<link rel="import" href="bower_components/paper-input/paper-input.html">
+<link rel="import" href="bower_components/paper-material/paper-material.html">
+<link rel="import" href="bower_components/paper-ripple/paper-ripple.html">
+<link rel="import" href="bower_components/paper-toast/paper-toast.html">
+<link rel="import" href="bower_components/paper-progress/paper-progress.html">
+<link rel="import" href="bower_components/polymer/polymer.html">
+<script>
+function popup_toast(string) {
+    toast = document.querySelector("#toast");
+    Polymer.dom(toastElement).textContent = string;
+    toast.show();
+}
+
+
+var REQUESTS = {
+    //calls callback with true for successful login, false for unsucessful login
+    login: function(username, password, callback) {
+        setTimeout(function() {
+            if (username == "admin") {
+                callback(true);
+            } else {
+                callback(false);
+            }
+        }, 2000);
+    },
+
+    answer: function(answer, callback) {
+        setTimeout(function() {
+            if (answer == "answer") {
+                callback(true);
+            } else {
+                callback(false);
+            }
+        }, 2000);
+    },
+
+    next_question: function(callback) {
+        setTimeout(function() {
+            questions = ["what is the sun?", "what is the moon?", "what are the stars"];
+            callback(questions[Math.floor(Math.random() * questions.length)]);
+        }, 2000);
+    }
+
+}
+
+var STATE = {
+    questionNumber: 1,
+    top_card: null,
+
+    switch_card_anim: function(new_top) {
+        var old_top = this.top_card;
+        new_top.position.y = -1000;
+
+        var hide_tween = new TWEEN.Tween(old_top.position)
+            .to({
+                z: -100
+
+            }, 500)
+            .easing(TWEEN.Easing.Cubic.In);
+
+        var show_tween = new TWEEN.Tween(new_top.position).to({
+            y: 0
+        }).easing(TWEEN.Easing.Cubic.Out);;
+
+        hide_tween.start();
+        show_tween.delay(100).start();
+        this.top_card = new_top;
+
+    },
+
+    try_login: function(login_button, login_progress) {
+        login_button.disabled = true;
+        login_progress.indeterminate = true;
+        //login_progress.value = 30;
+    },
+
+    error_login: function(login_button, login_progress) {
+        login_button.disabled = false;
+        login_progress.indeterminate = false;
+        login_progress.value = 0;
+
+        console.log(document.querySelector('#toast'));
+        popup_toast("Wrong username or password");
+    },
+
+    try_answer: function(submit_button, answer_progress) {
+        submit_button.disabled = true;
+        answer_progress.indeterminate = true;
+    },
+
+    error_answer: function(submit_button, answer_progress) {
+        submit_button.disabled = false;
+        answer_progress.indeterminate = false;
+
+        popup_toast("Wrong answer. Please try again");
+    }
+
+}
+
+
+function create_css3d_obj(elem) {
+    var cssObject = new THREE.CSS3DObject(elem);
+    return cssObject;
+}
+
+function attach_ripple(elem) {
+    var ripple = document.createElement("paper-ripple");
+    elem.appendChild(ripple);
+}
+
+function create_input(label) {
+    var input = document.createElement("paper-input");
+    input.setAttribute("label", label);
+    return input;
+}
+
+function create_button(label) {
+    var button = document.createElement("paper-button");
+    //button.innerHTML = "Login";
+    Polymer.dom(button).textContent = label;
+    //button.setAttribute("raised", "true");
+    return button;
+}
+
+
+function create_header(type, label) {
+    var header = document.createElement(type);
+    header.innerHTML = label;
+    return header;
+}
+
+function create_progress() {
+    var spinner = document.createElement("paper-progress");
+    return spinner;
+}
+
+function create_question_card(content) {
+    var cardElem = document.createElement("paper-material");
+    cardElem.setAttribute("class", "card");
+    cardElem.setAttribute("elevation", "5");
+    //attach_ripple(cardElem);
+    var question_progress = create_progress();
+    cardElem.appendChild(question_progress);
+
+
+    var questionContainer = document.createElement("div");
+    questionContainer.setAttribute("class", "question-container");
+    cardElem.appendChild(questionContainer);
+
+    var questionTitle = create_header("h3", "Question " + STATE.questionNumber);
+    questionContainer.appendChild(questionTitle);
+
+    var contentRegion = document.createElement("div");
+    contentRegion.setAttribute("class", "content-container");
+    contentRegion.innerHTML = content;
+    questionContainer.appendChild(contentRegion);
+
+    var submitForm = document.createElement("form");
+    questionContainer.appendChild(submitForm);
+
+    var answer_input = create_input("Answer");
+    submitForm.appendChild(answer_input);
+
+    var submit_button = create_button("Submit")
+    submitForm.appendChild(submit_button);
+
+
+    submit_button.onclick = function() {
+        STATE.try_answer(submit_button, question_progress);
+        REQUESTS.answer(answer_input.value, function(correct) {
+            if (correct) {
+                REQUESTS.next_question(function(question) {
+                    var question_card = create_question_card(question);
+                    STATE.switch_card_anim(question_card);
+                });
+            } else {
+                STATE.error_answer(submit_button, question_progress);
+            }
+        });
+    }
+    var cardObj = create_css3d_obj(cardElem);
+    cssScene.add(cardObj);
+
+    //store it in STATE
+    STATE.questionCardObj = cardObj;
+    STATE.questionCardElem = cardElem;
+
+    return cardObj;
+
+}
+
+function create_login_card(cssScene) {
+    var cardElem = document.createElement("paper-material");
+    cardElem.setAttribute("class", "card");
+
+    var login_progress = create_progress();
+    cardElem.appendChild(login_progress);
+
+
+    var loginContainer = document.createElement("form");
+    loginContainer.setAttribute("class", "login-container");
+    cardElem.appendChild(loginContainer)
+
+    var header = create_header("h1", "Cyberhawk");
+    loginContainer.appendChild(header);
+
+    var uname_input = create_input("username");
+    loginContainer.appendChild(uname_input);
+
+    var password_input = create_input("password");
+    password_input.setAttribute("type", "password")
+    loginContainer.appendChild(password_input);
+
+
+    var login_button = create_button("Login");
+    loginContainer.appendChild(login_button);
+
+    //login onclick
+    login_button.onclick = function() {
+        STATE.try_login(login_button, login_progress);
+
+        REQUESTS.login(uname_input.value, password_input.value, function(success) {
+            if (success) {
+                REQUESTS.next_question(function(question) {
+                    var question_card = create_question_card(question);
+                    console.log(question_card);
+                    STATE.switch_card_anim(question_card);
+                });
+            } else {
+                STATE.error_login(login_button, login_progress);
+            }
+        });
+    }
+
+    var cardObj = create_css3d_obj(cardElem);
+    cssScene.add(cardObj);
+
+    //store it in STATE
+    STATE.loginCardObj = cardObj;
+    STATE.loginCardElem = cardElem;
+
+    return cardObj;
+}
+
+
+//SETUP SCENE
+var cssScene = new THREE.Scene();
+var camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+var cssRenderer = new THREE.CSS3DRenderer();
+
+cssRenderer.setSize(window.innerWidth, window.innerHeight);
+cssRenderer.domElement.style.position = 'absolute';
+cssRenderer.domElement.style.top = 0;
+cssRenderer.domElement.style.background = '#161928';
+
+document.body.appendChild(cssRenderer.domElement);
+
+//SETUP TOAST
+toastElement = document.createElement("paper-toast");
+toastElement.setAttribute("z-index", "9999");
+toastElement.setAttribute("id", "toast");
+toastElement.setAttribute("duration", "5000");
+
+document.body.appendChild(toastElement);
+
+
+var login_card = create_login_card(cssScene);
+STATE.top_card = login_card;
+
+camera.position.z = 500;
+
+var render = function(time) {
+    requestAnimationFrame(render);
+    //cssObject.rotation.x += 0.01;
+    cssRenderer.render(cssScene, camera);
+    TWEEN.update(time);
+};
+
+render();
+</script>
+<!-- style -->
+<style type="text/css">
+body {
+    margin: 0;
+    font-family: "Meslo LG S DZ for Powerline" !important;
+    font-weight: 200;
+}
+
+canvas {
+    width: 100%;
+    height: 100%;
+}
+
+.card {
+    width: 480px;
+    height: 600px;
+    background-color: #24263D;
+    color: #dfdfdf;
+}
+
+paper-progress {
+    width: 100%;
+}
+
+#active-progress.paper-progress,
+#indeterminateSplitter,
+.indeterminate {
+    background-color: #6A7DD3 !important;
+}
+
+
+/* login */
+
+.login-container,
+.question-container {
+    padding-top: 20%;
+    padding-left: 20%;
+    padding-right: 20%;
+}
+
+.login-container paper-button {
+    margin-top: 10%;
+}
+
+paper-button {
+    background: #5ECBEE;
+    color: #dfdfdf;
+    padding-left: 3em;
+    padding-right: 3em;
+}
+
+.paper-input,
+label {
+    color: #bfbfbf !important;
+}
+
+.focused-line {
+    background: #bfbfbf !important;
+}
+
+paper-input-container input,
+paper-input-container label {
+    font-family: "Meslo LG S DZ for Powerline" !important;
+    color: #dfdfdf;
+    --paper-input-container-focus-color: #dfdfdf;
+}
+
+
+/* question */
+
+.question-container h3 {}
+
+.question-container .content-container {
+    margin-top: 30%;
+    margin-bottom: 30%;
+}
+
+.question-container paper-input {
+    margin-bottom: 10%;
+}
+
+.question-container paper-button {
+    margin-top: 20%;
+}
+</style>
+
+</html>
