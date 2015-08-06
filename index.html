@@ -41,6 +41,10 @@ var REQUESTS = {
         }, 2000);
     },
 
+    logout: function() {
+
+    },
+
     answer: function(answer, callback) {
         setTimeout(function() {
             if (answer == "answer") {
@@ -67,34 +71,33 @@ var STATE = {
     switch_card_anim: function(new_top) {
         var old_top = this.top_card;
         new_top.position.y = -1000;
+        new_top.position.z = 0;
 
         var hide_tween = new TWEEN.Tween(old_top.position)
             .to({
                 z: -100
-
             }, 500)
             .easing(TWEEN.Easing.Cubic.In);
 
-        var show_tween = new TWEEN.Tween(new_top.position).to({
+        var show_question_tween = new TWEEN.Tween(new_top.position).to({
             y: 0
         }).easing(TWEEN.Easing.Cubic.Out);;
 
         hide_tween.start();
-        show_tween.delay(100).start();
+        show_question_tween.delay(100).start();
         this.top_card = new_top;
-
     },
 
-    try_login: function(login_button, login_progress) {
-        login_button.disabled = true;
-        login_progress.indeterminate = true;
-        //login_progress.value = 30;
+    try_login: function() {
+        this.login_card_elem.login_button.disabled = true;
+        this.profile_card_elem.logout_button.enabled = true;
+        this.login_card_elem.login_progress.indeterminate = true;
     },
 
-    error_login: function(login_button, login_progress) {
-        login_button.disabled = false;
-        login_progress.indeterminate = false;
-        login_progress.value = 0;
+    error_login: function() {
+        this.login_card_elem.login_button.disabled = false;
+        this.login_card_elem.login_progress.indeterminate = false;
+        this.login_card_elem.login_progress.value = 0;
 
         console.log(document.querySelector('#toast'));
         popup_toast("Wrong username or password");
@@ -110,6 +113,31 @@ var STATE = {
         answer_progress.indeterminate = false;
 
         popup_toast("Wrong answer. Please try again");
+    },
+
+    show_profile: function() {
+        this.profile_card_obj.position.y = -1000;
+        this.profile_card_obj.position.x = 400;
+        var show_profile_tween = new TWEEN.Tween(this.profile_card_obj.position).to({
+            y: 0
+        }).easing(TWEEN.Easing.Cubic.Out);;
+        show_profile_tween.delay(200).start();
+    },
+
+    hide_profile: function() {
+        this.profile_card_obj.position.y = 0;
+        this.profile_card_obj.position.x = 400;
+
+        var hide_profile_tween = new TWEEN.Tween(this.profile_card_obj.position).to({
+            y: -1000
+        }).easing(TWEEN.Easing.Cubic.In);
+        hide_profile_tween.delay(200).start();
+    },
+
+    logout: function() {
+        //logout_button.disabled = true;
+        this.profile_card_elem.logout_button.disabled = true;
+        this.login_card_elem.login_button.disabled = false;
     }
 
 }
@@ -152,37 +180,38 @@ function create_progress() {
 }
 
 function create_question_card(content) {
-    var cardElem = document.createElement("paper-material");
-    cardElem.setAttribute("class", "card");
-    cardElem.setAttribute("elevation", "5");
-    //attach_ripple(cardElem);
+    var card_elem = document.createElement("paper-material");
+    card_elem.setAttribute("class", "card");
+    card_elem.setAttribute("elevation", "5");
+    //attach_ripple(card_elem);
     var question_progress = create_progress();
-    cardElem.appendChild(question_progress);
+    card_elem.appendChild(question_progress);
 
 
-    var questionContainer = document.createElement("div");
-    questionContainer.setAttribute("class", "question-container");
-    cardElem.appendChild(questionContainer);
+    var question_container = document.createElement("div");
+    question_container.setAttribute("class", "question-container");
+    card_elem.appendChild(question_container);
 
-    var questionTitle = create_header("h3", "Question " + STATE.questionNumber);
-    questionContainer.appendChild(questionTitle);
+    var question_title = create_header("h3", "Question " + STATE.questionNumber);
+    question_container.appendChild(question_title);
 
-    var contentRegion = document.createElement("div");
-    contentRegion.setAttribute("class", "content-container");
-    contentRegion.innerHTML = content;
-    questionContainer.appendChild(contentRegion);
+    var content_region = document.createElement("div");
+    content_region.setAttribute("class", "content-container");
+    content_region.innerHTML = content;
+    question_container.appendChild(content_region);
 
-    var submitForm = document.createElement("form");
-    questionContainer.appendChild(submitForm);
+    var submit_form = document.createElement("form");
+    submit_form.action = "#";
+    question_container.appendChild(submit_form);
 
     var answer_input = create_input("Answer");
-    submitForm.appendChild(answer_input);
+    submit_form.appendChild(answer_input);
 
     var submit_button = create_button("Submit")
-    submitForm.appendChild(submit_button);
+    submit_form.appendChild(submit_button);
 
 
-    submit_button.onclick = function() {
+    submit_form.onsubmit = submit_button.onclick = function() {
         STATE.try_answer(submit_button, question_progress);
         REQUESTS.answer(answer_input.value, function(correct) {
             if (correct) {
@@ -195,46 +224,60 @@ function create_question_card(content) {
             }
         });
     }
-    var cardObj = create_css3d_obj(cardElem);
-    cssScene.add(cardObj);
+
+    var hidden_submit = document.createElement("input");
+    hidden_submit.type = "submit";
+    hidden_submit.hidden = true;
+    submit_form.appendChild(hidden_submit);
+
+    var card_obj = create_css3d_obj(card_elem);
+    cssScene.add(card_obj);
 
     //store it in STATE
-    STATE.questionCardObj = cardObj;
-    STATE.questionCardElem = cardElem;
+    STATE.questioncard_obj = card_obj;
+    STATE.questioncard_elem = card_elem;
 
-    return cardObj;
+    return card_obj;
 
 }
 
 function create_login_card(cssScene) {
-    var cardElem = document.createElement("paper-material");
-    cardElem.setAttribute("class", "card");
+    var card_elem = document.createElement("paper-material");
+    card_elem.setAttribute("class", "card");
 
     var login_progress = create_progress();
-    cardElem.appendChild(login_progress);
+    card_elem.appendChild(login_progress);
+    card_elem.login_progress = login_progress;
 
 
-    var loginContainer = document.createElement("form");
-    loginContainer.setAttribute("class", "login-container");
-    cardElem.appendChild(loginContainer)
+    var login_form = document.createElement("form");
+    login_form.action = "#";
+    login_form.setAttribute("class", "login-container");
+    card_elem.appendChild(login_form)
 
     var header = create_header("h1", "Cyberhawk");
-    loginContainer.appendChild(header);
+    login_form.appendChild(header);
 
     var uname_input = create_input("username");
-    loginContainer.appendChild(uname_input);
+    login_form.appendChild(uname_input);
 
     var password_input = create_input("password");
     password_input.setAttribute("type", "password")
-    loginContainer.appendChild(password_input);
+    login_form.appendChild(password_input);
 
+    var hidden_submit = document.createElement("input");
+    hidden_submit.type = "submit";
+    hidden_submit.hidden = true;
+    login_form.appendChild(hidden_submit);
 
     var login_button = create_button("Login");
-    loginContainer.appendChild(login_button);
+    login_form.appendChild(login_button);
+    card_elem.login_button = login_button;
+
 
     //login onclick
-    login_button.onclick = function() {
-        STATE.try_login(login_button, login_progress);
+    login_form.onsubmit = login_button.onclick = function() {
+        STATE.try_login();
 
         REQUESTS.login(uname_input.value, password_input.value, function(success) {
             if (success) {
@@ -242,23 +285,67 @@ function create_login_card(cssScene) {
                     var question_card = create_question_card(question);
                     console.log(question_card);
                     STATE.switch_card_anim(question_card);
+                    STATE.show_profile();
                 });
             } else {
-                STATE.error_login(login_button, login_progress);
+                STATE.error_login();
             }
         });
     }
 
-    var cardObj = create_css3d_obj(cardElem);
-    cssScene.add(cardObj);
+    var card_obj = create_css3d_obj(card_elem);
+    cssScene.add(card_obj);
 
     //store it in STATE
-    STATE.loginCardObj = cardObj;
-    STATE.loginCardElem = cardElem;
+    STATE.login_card_obj = card_obj;
+    STATE.login_card_elem = card_elem;
 
-    return cardObj;
+    return card_obj;
 }
 
+function create_profile_card() {
+    var card_elem = document.createElement("paper-material");
+    card_elem.setAttribute("class", "card");
+    card_elem.setAttribute("style", "width: 300px; height: 400px");
+
+    var profileContainer = document.createElement("div");
+    profileContainer.setAttribute("class", "profile-container");
+    card_elem.appendChild(profileContainer);
+
+
+    var profileName = create_header("h3", "Dummy Profile name");
+    profileName.setAttribute("class", "profile-name");
+    profileContainer.appendChild(profileName);
+
+    var leadersContainer = document.createElement("div");
+    profileContainer.appendChild(leadersContainer);
+
+    var leadersHeading = create_header("h3", "Leaders");
+    leadersContainer.appendChild(leadersHeading)
+
+
+    var logout_button = create_button("Logout");
+    profileContainer.appendChild(logout_button);
+    card_elem.logout_button = logout_button;
+
+    logout_button.onclick = function() {
+        REQUESTS.logout();
+        STATE.logout();
+        STATE.switch_card_anim(STATE.login_card_obj);
+        STATE.hide_profile();
+
+    }
+
+    var card_obj = create_css3d_obj(card_elem);
+    cssScene.add(card_obj);
+
+    STATE.profile_card_obj = card_obj;
+    STATE.profile_card_elem = card_elem;
+
+    card_obj.position.y = -1000;
+
+    return card_obj;
+}
 
 //SETUP SCENE
 var cssScene = new THREE.Scene();
@@ -283,6 +370,10 @@ document.body.appendChild(toastElement);
 
 var login_card = create_login_card(cssScene);
 STATE.top_card = login_card;
+
+//create the profile card and hide it
+var profile_card = create_profile_card(cssScene);
+STATE.profile_card = profile_card;
 
 camera.position.z = 500;
 
@@ -378,6 +469,16 @@ paper-input-container label {
 
 .question-container paper-button {
     margin-top: 20%;
+}
+
+
+/*profile*/
+
+.profile-container {
+    padding-top: 10%;
+    padding-bottom: 30%;
+    padding-left: 20%;
+    padding-right: 10%;
 }
 </style>
 
