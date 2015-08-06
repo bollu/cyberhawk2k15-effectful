@@ -90,7 +90,7 @@ var STATE = {
 
     try_login: function() {
         this.login_card_elem.login_button.disabled = true;
-        this.profile_card_elem.logout_button.enabled = true;
+        this.profile_card_elem.logout_button.disabled = false;
         this.login_card_elem.login_progress.indeterminate = true;
     },
 
@@ -117,7 +117,7 @@ var STATE = {
 
     show_profile: function() {
         this.profile_card_obj.position.y = -1000;
-        this.profile_card_obj.position.x = 400;
+        // this.profile_card_obj.position.x = 400;
         var show_profile_tween = new TWEEN.Tween(this.profile_card_obj.position).to({
             y: 0
         }).easing(TWEEN.Easing.Cubic.Out);;
@@ -126,7 +126,7 @@ var STATE = {
 
     hide_profile: function() {
         this.profile_card_obj.position.y = 0;
-        this.profile_card_obj.position.x = 400;
+        //this.profile_card_obj.position.x = 400;
 
         var hide_profile_tween = new TWEEN.Tween(this.profile_card_obj.position).to({
             y: -1000
@@ -300,32 +300,35 @@ function create_login_card(cssScene) {
     STATE.login_card_obj = card_obj;
     STATE.login_card_elem = card_elem;
 
+    STATE.top_card = card_obj;
+
     return card_obj;
 }
 
 function create_profile_card() {
     var card_elem = document.createElement("paper-material");
     card_elem.setAttribute("class", "card");
-    card_elem.setAttribute("style", "width: 300px; height: 400px");
+    card_elem.setAttribute("style", "width: 22%; height: 80%;");
+    attach_ripple(card_elem);
 
-    var profileContainer = document.createElement("div");
-    profileContainer.setAttribute("class", "profile-container");
-    card_elem.appendChild(profileContainer);
+    var profile_container = document.createElement("div");
+    profile_container.setAttribute("class", "profile-container");
+    card_elem.appendChild(profile_container);
 
 
-    var profileName = create_header("h3", "Dummy Profile name");
+    var profileName = create_header("h3", "Dummy Name");
     profileName.setAttribute("class", "profile-name");
-    profileContainer.appendChild(profileName);
+    profile_container.appendChild(profileName);
 
     var leadersContainer = document.createElement("div");
-    profileContainer.appendChild(leadersContainer);
+    profile_container.appendChild(leadersContainer);
 
-    var leadersHeading = create_header("h3", "Leaders");
+    var leadersHeading = create_header("h5", "Leaders");
     leadersContainer.appendChild(leadersHeading)
 
 
     var logout_button = create_button("Logout");
-    profileContainer.appendChild(logout_button);
+    profile_container.appendChild(logout_button);
     card_elem.logout_button = logout_button;
 
     logout_button.onclick = function() {
@@ -347,9 +350,35 @@ function create_profile_card() {
     return card_obj;
 }
 
+function create_hints_card() {
+    var card_elem = document.createElement("paper-material");
+    card_elem.setAttribute("class", "card");
+    card_elem.setAttribute("style", "width: 25%; height: 80%");
+    attach_ripple(card_elem);
+
+    var hints_container = document.createElement("div");
+    hints_container.setAttribute("class", "hints-container");
+    card_elem.appendChild(hints_container);
+
+
+    var hints_header = create_header("h3", "Hints");
+    hints_container.appendChild(hints_header);
+
+    var hints_container = document.createElement("div");
+    hints_container.setAttribute("class", "hints-container");
+
+    var card_obj = create_css3d_obj(card_elem);
+    cssScene.add(card_obj);
+
+    STATE.hints_card_obj = card_obj;
+    STATE.hints_card_elem = card_elem;
+
+}
+
 //SETUP SCENE
 var cssScene = new THREE.Scene();
 var camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+camera.position.z = 500;
 var cssRenderer = new THREE.CSS3DRenderer();
 
 cssRenderer.setSize(window.innerWidth, window.innerHeight);
@@ -368,14 +397,9 @@ toastElement.setAttribute("duration", "5000");
 document.body.appendChild(toastElement);
 
 
-var login_card = create_login_card(cssScene);
-STATE.top_card = login_card;
-
-//create the profile card and hide it
-var profile_card = create_profile_card(cssScene);
-STATE.profile_card = profile_card;
-
-camera.position.z = 500;
+create_login_card(cssScene);
+create_profile_card(cssScene);
+create_hints_card(cssScene);
 
 var render = function(time) {
     requestAnimationFrame(render);
@@ -383,6 +407,17 @@ var render = function(time) {
     cssRenderer.render(cssScene, camera);
     TWEEN.update(time);
 };
+
+//onresize handler
+window.onresize = function() {
+    camera.aspectRatio = window.innerWidth / window.innerHeight;
+    cssRenderer.setSize(window.innerWidth, window.innerHeight);
+
+    STATE.profile_card_obj.position.x = window.innerWidth * 0.35;
+    STATE.hints_card_obj.position.x = -window.innerWidth * 0.35;
+    console.log("resized!");
+};
+window.onresize();
 
 render();
 </script>
@@ -400,8 +435,8 @@ canvas {
 }
 
 .card {
-    width: 480px;
-    height: 600px;
+    width: 40%;
+    height: 80%;
     background-color: #24263D;
     color: #dfdfdf;
 }
@@ -433,8 +468,8 @@ paper-progress {
 paper-button {
     background: #5ECBEE;
     color: #dfdfdf;
-    padding-left: 3em;
-    padding-right: 3em;
+    padding-left: 10%;
+    padding-right: 10%;
 }
 
 .paper-input,
@@ -477,7 +512,23 @@ paper-input-container label {
 .profile-container {
     padding-top: 10%;
     padding-bottom: 30%;
-    padding-left: 20%;
+    padding-left: 10%;
+    padding-right: 10%;
+}
+
+.profile-container paper-button {
+    margin-top: 20%;
+}
+
+
+/*
+hints
+*/
+
+.hints-container {
+    padding-top: 10%;
+    padding-bottom: 30%;
+    padding-left: 10%;
     padding-right: 10%;
 }
 </style>
