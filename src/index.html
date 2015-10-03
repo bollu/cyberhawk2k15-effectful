@@ -88,10 +88,17 @@ var REQUESTS = {
 
 }
 
+var GLOBALS = {
+    camera: null,
+    cssRenderer: null,
+    cssScene: null
+
+}
 var STATE = {
     questionNumber: 1,
     top_card: null,
     showing_hints: true,
+
 
     switch_card_anim: function(new_top) {
         var old_top = this.top_card;
@@ -285,7 +292,7 @@ function create_question_card(content) {
     submit_form.appendChild(hidden_submit);
 
     var card_obj = create_css3d_obj(card_elem);
-    cssScene.add(card_obj);
+    GLOBALS.cssScene.add(card_obj);
 
     //store it in STATE
     STATE.questioncard_obj = card_obj;
@@ -329,7 +336,13 @@ function create_login_card(cssScene) {
     login_form.appendChild(login_button);
     card_elem.login_button = login_button;
 
+    var goto_register_button = create_button("Register now");
+    login_form.appendChild(goto_register_button);
 
+
+    goto_register_button.onclick = function() {
+        STATE.switch_card_anim(STATE.register_card_obj);
+    };
     //login onclick
     login_form.onsubmit = login_button.onclick = function(e) {
         e.preventDefault();
@@ -354,7 +367,7 @@ function create_login_card(cssScene) {
     }
 
     var card_obj = create_css3d_obj(card_elem);
-    cssScene.add(card_obj);
+    GLOBALS.cssScene.add(card_obj);
 
     //store it in STATE
     STATE.login_card_obj = card_obj;
@@ -403,7 +416,7 @@ function create_profile_card() {
     }
 
     var card_obj = create_css3d_obj(card_elem);
-    cssScene.add(card_obj);
+    GLOBALS.cssScene.add(card_obj);
 
     STATE.profile_card_obj = card_obj;
     STATE.profile_card_elem = card_elem;
@@ -440,7 +453,7 @@ function create_hints_card() {
     var card_obj = create_css3d_obj(card_elem);
     card_obj.position.y = -1000;
 
-    cssScene.add(card_obj);
+    GLOBALS.cssScene.add(card_obj);
 
     STATE.hints_card_obj = card_obj;
     STATE.hints_card_elem = card_elem;
@@ -469,7 +482,7 @@ function create_rules_card() {
     card_obj.position.z = -2;
     card_obj.position.y = -1000;
 
-    cssScene.add(card_obj);
+    GLOBALS.cssScene.add(card_obj);
 
     STATE.rules_card_obj = card_obj;
     STATE.rules_card_elem = card_elem;
@@ -524,11 +537,12 @@ function create_register_card() {
     register_form.appendChild(hidden_submit);
 
     var register_button = create_button("Register");
+    register_button.setAttribute("class", "spaced-button");
     register_form.appendChild(register_button);
     card_elem.register_button = register_button;
 
 
-    var switch_to_login_button = create_button("Registered? Login now");
+    var switch_to_login_button = create_button("Go to Login");
     register_form.appendChild(switch_to_login_button);
 
     switch_to_login_button.onclick = function() {
@@ -598,7 +612,7 @@ function create_register_card() {
     }
 
     var card_obj = create_css3d_obj(card_elem);
-    cssScene.add(card_obj);
+    GLOBALS.cssScene.add(card_obj);
 
     //store it in STATE
     STATE.register_card_obj = card_obj;
@@ -608,54 +622,63 @@ function create_register_card() {
 
     return card_obj;
 }
-//SETUP SCENE
-var cssScene = new THREE.Scene();
-var camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-camera.position.z = 500;
-var cssRenderer = new THREE.CSS3DRenderer();
 
-cssRenderer.setSize(window.innerWidth, window.innerHeight);
-cssRenderer.domElement.style.position = 'absolute';
-cssRenderer.domElement.style.top = 0;
-cssRenderer.domElement.style.background = '#161928';
+function init() {
+    //SETUP SCENE
+    var cssScene = new THREE.Scene();
+    GLOBALS.cssScene = cssScene;
 
-document.body.appendChild(cssRenderer.domElement);
+    var camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+    GLOBALS.camera = camera;
 
-//SETUP TOAST
-toastElement = document.createElement("paper-toast");
-toastElement.setAttribute("z-index", "9999");
-toastElement.setAttribute("id", "toast");
-toastElement.setAttribute("duration", "5000");
+    camera.position.z = 500;
+    var cssRenderer = new THREE.CSS3DRenderer();
+    GLOBALS.cssRenderer = cssRenderer;
 
-document.body.appendChild(toastElement);
+    cssRenderer.setSize(window.innerWidth, window.innerHeight);
+    cssRenderer.domElement.style.position = 'absolute';
+    cssRenderer.domElement.style.top = 0;
+    cssRenderer.domElement.style.background = '#161928';
+
+    document.body.appendChild(cssRenderer.domElement);
+
+    //SETUP TOAST
+    toastElement = document.createElement("paper-toast");
+    toastElement.setAttribute("z-index", "9999");
+    toastElement.setAttribute("id", "toast");
+    toastElement.setAttribute("duration", "5000");
+
+    document.body.appendChild(toastElement);
 
 
-create_register_card(cssScene);
-create_login_card(cssScene);
-create_profile_card(cssScene);
-create_hints_card(cssScene);
-create_rules_card(cssScene);
-
+    create_register_card(cssScene);
+    create_login_card(cssScene);
+    create_profile_card(cssScene);
+    create_hints_card(cssScene);
+    create_rules_card(cssScene);
+};
 
 var render = function(time) {
     requestAnimationFrame(render);
     //cssObject.rotation.x += 0.01;
-    cssRenderer.render(cssScene, camera);
+    GLOBALS.cssRenderer.render(GLOBALS.cssScene, GLOBALS.camera);
     TWEEN.update(time);
 };
 
 //onresize handler
 window.onresize = function() {
-    camera.aspectRatio = window.innerWidth / window.innerHeight;
-    cssRenderer.setSize(window.innerWidth, window.innerHeight);
+
+    GLOBALS.camera.aspectRatio = window.innerWidth / window.innerHeight;
+    GLOBALS.cssRenderer.setSize(window.innerWidth, window.innerHeight);
 
     STATE.profile_card_obj.position.x = window.innerWidth * 0.35;
     STATE.hints_card_obj.position.x = -window.innerWidth * 0.35;
     STATE.rules_card_obj.position.x = -window.innerWidth * 0.35;
     console.log("resized!");
 };
-window.onresize();
 
+init();
+window.onresize();
 render();
 </script>
 <!-- style -->
@@ -724,6 +747,14 @@ paper-input-container label {
     font-family: "Meslo LG S DZ for Powerline" !important;
     color: #dfdfdf;
     --paper-input-container-focus-color: #dfdfdf;
+}
+
+
+/*register, login*/
+
+.spaced-button {
+    margin-top: 1em;
+    margin-bottom: 1em;
 }
 
 
