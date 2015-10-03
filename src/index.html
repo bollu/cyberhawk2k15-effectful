@@ -91,7 +91,8 @@ var REQUESTS = {
 var GLOBALS = {
     camera: null,
     cssRenderer: null,
-    cssScene: null
+    cssScene: null,
+    mousePos: null,
 
 }
 var STATE = {
@@ -658,8 +659,28 @@ function init() {
     create_rules_card(cssScene);
 };
 
+
+function create_mouse_position_tracker() {
+    GLOBALS.mousePos = {
+        x: 0,
+        y: 0
+    };
+
+    $(document).mousemove(function(event) {
+        GLOBALS.mousePos = {
+            x: event.pageX,
+            y: event.pageY
+        };
+    });
+
+}
 var render = function(time) {
     requestAnimationFrame(render);
+    const ROTATE_FACTOR = 0.2;
+
+    GLOBALS.camera.rotation.y = -ROTATE_FACTOR * (GLOBALS.mousePos.x - window.innerWidth * 0.5) / window.innerWidth;
+    GLOBALS.camera.rotation.x = -ROTATE_FACTOR * (GLOBALS.mousePos.y - window.innerHeight * 0.5) / window.innerHeight;
+
     //cssObject.rotation.x += 0.01;
     GLOBALS.cssRenderer.render(GLOBALS.cssScene, GLOBALS.camera);
     TWEEN.update(time);
@@ -678,6 +699,7 @@ window.onresize = function() {
 };
 
 init();
+create_mouse_position_tracker();
 window.onresize();
 render();
 </script>
