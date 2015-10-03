@@ -1,0 +1,1146 @@
+{
+	"auto_complete":
+	{
+		"selected_items":
+		[
+			[
+				"paddin",
+				"padding-bottom"
+			],
+			[
+				"padd",
+				"padding-top"
+			],
+			[
+				"paddi",
+				"padding-left"
+			],
+			[
+				"paper",
+				"paper_button"
+			],
+			[
+				"web",
+				"webcomponents"
+			],
+			[
+				"mate",
+				"material-ui"
+			],
+			[
+				"materi",
+				"material-ui"
+			],
+			[
+				"ent",
+				"entry_point"
+			],
+			[
+				"typed",
+				"typedjs"
+			],
+			[
+				"bow",
+				"bower-components"
+			],
+			[
+				"bowe",
+				"bower_components"
+			],
+			[
+				"req",
+				"request_name"
+			],
+			[
+				"widh",
+				"width_max	function"
+			],
+			[
+				"width",
+				"width_limit_expr	statement"
+			],
+			[
+				"widge",
+				"widget_left	statement"
+			],
+			[
+				"stre",
+				"stretch_height_grid	statement"
+			],
+			[
+				"str",
+				"stretch_w	statement"
+			],
+			[
+				"va",
+				"value_vectorized	statement"
+			],
+			[
+				"hei",
+				"height_grid	statement"
+			],
+			[
+				"width_",
+				"width_grid	statement"
+			],
+			[
+				"var",
+				"vargrid	statement"
+			],
+			[
+				"gen",
+				"genRootFixed"
+			],
+			[
+				"x",
+				"xspan	statement"
+			],
+			[
+				"w_",
+				"w_var	forflow"
+			],
+			[
+				"var_",
+				"var_grid	statement"
+			],
+			[
+				"widg",
+				"widget_spacer_bottom	statement"
+			],
+			[
+				"widget",
+				"widget_y_axis	statement"
+			],
+			[
+				"wdge",
+				"widget_top_left	statement"
+			],
+			[
+				"fi",
+				"filtered"
+			],
+			[
+				"filt",
+				"filterFn"
+			],
+			[
+				"getSa",
+				"getSavedIter"
+			],
+			[
+				"mod",
+				"moduloList"
+			],
+			[
+				"ge",
+				"getSaved"
+			],
+			[
+				"height_X",
+				"height_xlabel	statement"
+			],
+			[
+				"yaxi",
+				"yaxis_widget	statement"
+			],
+			[
+				"xaxi",
+				"xaxis_widget	statement"
+			],
+			[
+				"space_",
+				"space_filler_title	statement"
+			],
+			[
+				"yla",
+				"ylabel_widget	statement"
+			],
+			[
+				"space",
+				"space_filler_x_axis	statement"
+			],
+			[
+				"ylabel_wid",
+				"ylabel_widget"
+			],
+			[
+				"y_",
+				"ylabel_widget"
+			],
+			[
+				"titl",
+				"title_widget"
+			],
+			[
+				"xla",
+				"xlabel_widget	statement"
+			],
+			[
+				"res",
+				"resize_widget	function"
+			],
+			[
+				"lao",
+				"layout_array	function"
+			],
+			[
+				"prev",
+				"prev_widget_id	statement"
+			],
+			[
+				"he",
+				"height	function"
+			],
+			[
+				"heigh",
+				"height_max"
+			],
+			[
+				"_var",
+				"_var_h_rect	statement"
+			],
+			[
+				"_va",
+				"_var_w_rect	statement"
+			],
+			[
+				"_var_",
+				"_var_w_rect	statement"
+			],
+			[
+				"add_er",
+				"add_edit_var	function"
+			],
+			[
+				"_upda",
+				"_update_child_widget_constraints	function"
+			],
+			[
+				"height",
+				"height_max	function"
+			],
+			[
+				"_wid",
+				"_width_limits"
+			],
+			[
+				"ti",
+				"title_widget	statement"
+			],
+			[
+				"add_",
+				"add_widget	function"
+			],
+			[
+				"remove",
+				"remove_widget	function"
+			],
+			[
+				"max_",
+				"max_width	statement"
+			],
+			[
+				"min_",
+				"min_width	function"
+			],
+			[
+				"fixed",
+				"fixed_width	function"
+			],
+			[
+				"max",
+				"max_width	function"
+			],
+			[
+				"with",
+				"width_slop	statement"
+			],
+			[
+				"fixed_",
+				"fixed_height	function"
+			],
+			[
+				"_update",
+				"_update_child_widgets_except"
+			],
+			[
+				"lay",
+				"layout_array"
+			],
+			[
+				"streth",
+				"stretch_h_eqn_terms	statement"
+			],
+			[
+				"stret",
+				"stretch_w_eqn_terms	statement"
+			],
+			[
+				"terms",
+				"terms_arr	forstmt"
+			],
+			[
+				"prev_",
+				"prev_widget	statement"
+			],
+			[
+				"lat",
+				"layout_array	function"
+			],
+			[
+				"prev_wi",
+				"prev_widget_key	statement"
+			],
+			[
+				"la",
+				"layout_array	function"
+			],
+			[
+				"stretch",
+				"stretch_w_eqns	statement"
+			],
+			[
+				"wid",
+				"widget	statement"
+			],
+			[
+				"total_",
+				"total_h_eqns	statement"
+			],
+			[
+				"add",
+				"add_widget	function"
+			],
+			[
+				"row",
+				"row_span	param"
+			],
+			[
+				"min",
+				"min_width	function"
+			],
+			[
+				"exr",
+				"expression"
+			],
+			[
+				"width_va",
+				"width_var	statement"
+			],
+			[
+				"_wi",
+				"_width_limits	statement"
+			],
+			[
+				"widt",
+				"width_row	statement"
+			],
+			[
+				"grid",
+				"grid_layout	statement"
+			],
+			[
+				"wide",
+				"widget_top	statement"
+			],
+			[
+				"_virid",
+				"_viridis_data_raw	statement"
+			],
+			[
+				"abs",
+				"absolute	instance"
+			],
+			[
+				"colorbar_",
+				"colorbar_halfdim	statement"
+			],
+			[
+				"img_",
+				"img_dim	statement"
+			],
+			[
+				"canv",
+				"canvas_dim	statement"
+			],
+			[
+				"image_tra",
+				"image_transforms"
+			],
+			[
+				"bord",
+				"border_color	function"
+			],
+			[
+				"_bor",
+				"_border	statement"
+			]
+		]
+	},
+	"buffers":
+	[
+	],
+	"build_system": "",
+	"build_system_choices":
+	[
+	],
+	"build_varint": "",
+	"command_palette":
+	{
+		"height": 307.0,
+		"last_filter": "prett",
+		"selected_items":
+		[
+			[
+				"prett",
+				"HTMLPrettify"
+			],
+			[
+				"json",
+				"Set Syntax: JSON"
+			],
+			[
+				"insa",
+				"Package Control: Install Package"
+			],
+			[
+				"rein",
+				"Indentation: Reindent Lines"
+			],
+			[
+				"sidebar",
+				"View: Toggle Open Files in Side Bar"
+			],
+			[
+				"remove",
+				"Package Control: Remove Package"
+			],
+			[
+				"install",
+				"Package Control: Install Package"
+			],
+			[
+				"cmake",
+				"Set Syntax: CMake"
+			],
+			[
+				"insta",
+				"Package Control: Install Package"
+			],
+			[
+				"mips",
+				"Set Syntax: MIPS"
+			],
+			[
+				"packa",
+				"Package Control: Install Package"
+			],
+			[
+				"toggle s",
+				"View: Toggle Side Bar"
+			],
+			[
+				"toggle si",
+				"View: Toggle Side Bar"
+			],
+			[
+				"nasm",
+				"Set Syntax: Assembly x86 (NASM)"
+			],
+			[
+				"ruby",
+				"Set Syntax: Ruby"
+			],
+			[
+				"disable ",
+				"Side Bar: Disable Syncing"
+			],
+			[
+				"repl clo",
+				"SublimeREPL: Clojure"
+			],
+			[
+				"repl cl",
+				"SublimeREPL: Clojure"
+			],
+			[
+				"shell",
+				"SublimeREPL: Shell"
+			],
+			[
+				"python",
+				"SublimeREPL: Python"
+			],
+			[
+				"repl shel",
+				"SublimeREPL: Shell"
+			],
+			[
+				"anaconda li",
+				"Anaconda: Next lint error"
+			],
+			[
+				"toggle min",
+				"View: Toggle Minimap"
+			],
+			[
+				"settings",
+				"Preferences: Settings - Default"
+			],
+			[
+				"settings ",
+				"Preferences: Settings - User"
+			],
+			[
+				"toggle ",
+				"View: Toggle Status Bar"
+			],
+			[
+				"toggle ta",
+				"View: Toggle Tabs"
+			],
+			[
+				"key ",
+				"Preferences: Key Bindings - User"
+			],
+			[
+				"key bind",
+				"Preferences: Key Bindings - Default"
+			],
+			[
+				"packaing ",
+				"Package Control: Install Package"
+			],
+			[
+				"settings de",
+				"Preferences: Settings - Default"
+			],
+			[
+				"prefer",
+				"Preferences: Settings - User"
+			],
+			[
+				"anaconda",
+				"Anaconda: Find object usage"
+			],
+			[
+				"pac",
+				"Package Control: Install Package"
+			],
+			[
+				"packin",
+				"Package Control: Install Package"
+			]
+		],
+		"width": 467.0
+	},
+	"console":
+	{
+		"height": 126.0,
+		"history":
+		[
+			"import urllib.request,os,hashlib; h = 'eb2297e1a458f27d836c04bb0cbaf282' + 'd0e7a3098092775ccb37ca9d6b2e4b7d'; pf = 'Package Control.sublime-package'; ipp = sublime.installed_packages_path(); urllib.request.install_opener( urllib.request.build_opener( urllib.request.ProxyHandler()) ); by = urllib.request.urlopen( 'http://packagecontrol.io/' + pf.replace(' ', '%20')).read(); dh = hashlib.sha256(by).hexdigest(); print('Error validating download (got %s instead of %s), please try manual install' % (dh, h)) if dh != h else open(os.path.join( ipp, pf), 'wb' ).write(by)"
+		]
+	},
+	"distraction_free":
+	{
+		"menu_visible": true,
+		"show_minimap": true,
+		"show_open_files": false,
+		"show_tabs": true,
+		"side_bar_visible": false,
+		"status_bar_visible": true
+	},
+	"expanded_folders":
+	[
+		"/Users/bollu/prog/cyberhawk-old"
+	],
+	"file_history":
+	[
+		"/Users/bollu/prog/cyberhawk/src/css/default.scss",
+		"/Users/bollu/prog/cyberhawk-material/src/css/default.scss",
+		"/Users/bollu/prog/cyberhawk-material/gulpfile.js",
+		"/Users/bollu/prog/cyberhawk-material/src/index.html",
+		"/Users/bollu/prog/cyberhawk-old/index.html",
+		"/Users/bollu/prog/cyberhawk-material/src/js/grids-responsive-min.css",
+		"/Users/bollu/prog/cyberhawk/gulpfile.js",
+		"/Users/bollu/prog/cyberhawk/src/js/app.js",
+		"/Users/bollu/prog/cyberhawk-material/.gitignore",
+		"/Users/bollu/prog/cyberhawk/.gitignore",
+		"/Users/bollu/prog/cyberhawk/dist/js/material-ui/raised-button.js",
+		"/Users/bollu/prog/cyberhawk/src/jsx/react.jsx",
+		"/Users/bollu/prog/cyberhawk/src/js/react.jsx",
+		"/Users/bollu/temp/cyberhawk-tester/hawk-api.py",
+		"/Users/bollu/prog/cyberhawk/src/jsx/react.js",
+		"/Users/bollu/prog/cyberhawk/src/index.html",
+		"/Users/bollu/prog/cyberhawk/dist/index.html",
+		"/Users/bollu/hobby-prog/LoveCraft/CMakeLists",
+		"/Users/bollu/prog/vispy/vispy/visuals/gridlines.py",
+		"/Users/bollu/prog/vispy/vispy/scene/widgets/widget.py",
+		"/Users/bollu/prog/vispy/examples/basics/plotting/grid_basic.py",
+		"/Users/bollu/prog/vispy/examples/basics/plotting/grid_two_row_two_col_.py",
+		"/Users/bollu/prog/vispy/vispy/scene/widgets/grid.py",
+		"/Users/bollu/prog/mips-learning/bollu.mips",
+		"/Users/bollu/prog/vispy/vispy/ext/_bundled/cassowary/simplex_solver.py",
+		"/Users/bollu/hobby-prog/hask-lisp-interp/src/Main.hs",
+		"/Users/bollu/temp/hask-fix/fix.hs",
+		"/Users/bollu/temp/hask-fix/makefile",
+		"/Users/bollu/prog/questions-bansal.md",
+		"/Users/bollu/prog/questions.md",
+		"/usr/include/sys/syscall.h",
+		"/Users/bollu/hobby-prog/assembly/1-hello-world.asm",
+		"/Users/bollu/hobby-prog/assembly/2-c-bridge.asm",
+		"/Users/bollu/hobby-prog/assembly/1-hello-world.",
+		"/Users/bollu/temp/collect_authors_patches.sh",
+		"/Users/bollu/prog/vispy/examples/basics/plotting/grid-basic.py",
+		"/Users/bollu/vm/ubuntu1404/Vagrantfile",
+		"/Users/bollu/temp/killing/makefile",
+		"/Users/bollu/prog/vispy/vispy/scene/widgets/colorbar.py",
+		"/Users/bollu/temp/vispy-grid/grid-holed.py",
+		"/Users/bollu/temp/vispy-grid/grid-two-row-two-col.py",
+		"/Users/bollu/temp/vispy-grid/grid-x-y-viewbox.py",
+		"/Users/bollu/prog/vispy/examples/basics/plotting/grid.py",
+		"/Users/bollu/temp/killing/killing.hs",
+		"/Users/bollu/temp/killing.hs",
+		"/Users/bollu/prog/vispy/vispy/scene/widgets/axis.py",
+		"/Users/bollu/prog/pixeldruid/content/gsoc-vispy-week-6.md",
+		"/Users/bollu/temp/master-grid.py",
+		"/Users/bollu/temp/vispy-grid.py",
+		"/Users/bollu/temp/vispy-grid-axis.py",
+		"/Users/bollu/prog/pixeldruid/content/gsoc-vispy-report-6.md",
+		"/Users/bollu/prog/vispy/vispy/plot/plotwidget.py",
+		"/Users/bollu/temp/vispy-grid-counterexample",
+		"/Users/bollu/prog/vispy/examples/basics/scene/grid.py",
+		"/Users/bollu/prog/vispy/examples/basics/plotting/plot.py",
+		"/Users/bollu/prog/vispy/examples/basics/plotting/scatter_histogram.py",
+		"/Users/bollu/prog/vispy/vispy/geometry/rect.py",
+		"/Users/bollu/temp/vispy-basic-plot.py",
+		"/Users/bollu/prog/vispy/.travis.yml",
+		"/Users/bollu/prog/vispy/vispy/scene/cameras/tests/test_perspective.py",
+		"/Users/bollu/prog/vispy/vispy/scene/widgets/label.py",
+		"/Users/bollu/prog/vispy/vispy/visuals/transforms/linear.py",
+		"/Users/bollu/prog/vispy/vispy/visuals/axis.py",
+		"/Users/bollu/prog/vispy/vispy/visuals/text/text.py",
+		"/Users/bollu/prog/cyberhawk/index.html",
+		"/Users/bollu/Library/Application Support/Sublime Text 3/Packages/User/SublimeREPL.sublime-settings",
+		"/Users/bollu/Library/Application Support/Sublime Text 3/Packages/SublimeREPL/SublimeREPL.sublime-settings",
+		"/Users/bollu/prog/vispy/vispy/visuals/visual.py",
+		"/Users/bollu/hobby-prog/jupyter-rust-kernel/kernel.json",
+		"/Users/bollu/hobby-prog/jupyter-rust-kernel/jupyter-rust-kernel/Cargo.toml",
+		"/Users/bollu/hobby-prog/jupyter-rust-kernel/setup.sh",
+		"/Users/bollu/hobby-prog/gen-griz/gen-griz.py",
+		"/Users/bollu/prog/vispy/examples/basics/visuals/colorbar_visual.py",
+		"/Users/bollu/Library/Application Support/Sublime Text 3/Packages/User/Preferences.sublime-settings",
+		"/Users/bollu/prog/vispy/vispy/visuals/colorbar.py",
+		"/Users/bollu/prog/vispy/examples/demo/plot/plot.py",
+		"/Users/bollu/prog/vispy/vispy/color/colormap.py",
+		"/Users/bollu/prog/vispy/examples/basics/visuals/colorbar_visual_types.py",
+		"/Users/bollu/prog/vispy/vispy/testing/_runners.py",
+		"/Users/bollu/prog/vispy/vispy/plot/fig.py",
+		"/Users/bollu/prog/vispy/vispy/ext/_bundled/ordereddict.py",
+		"/Users/bollu/prog/vispy/vispy/ext/cassowary.py",
+		"/Users/bollu/prog/vispy/vispy/ext/glfw.py",
+		"/Users/bollu/Desktop/contact-info",
+		"/Users/bollu/prog/vispy/vispy/visuals/__init__.py",
+		"/Users/bollu/prog/vispy/vispy/visuals/tests/test_colorbar.py",
+		"/Users/bollu/prog/vispy/vispy/color/color_array.py",
+		"/Users/bollu/prog/vispy/vispy/visuals/border.py",
+		"/Users/bollu/prog/vispy/examples/basics/scene/colorbar_widget.py",
+		"/Users/bollu/.vimrc",
+		"/Users/bollu/prog/vispy/examples/basics/plotting/colorbar.py",
+		"/Users/bollu/.zshrc",
+		"/Users/bollu/Library/Application Support/Sublime Text 3/Packages/User/Distraction Free.sublime-settings",
+		"/Users/bollu/prog/vispy/vispy/visuals/image.py",
+		"/Users/bollu/Library/Application Support/Sublime Text 3/Packages/Default/Preferences.sublime-settings",
+		"/Users/bollu/prog/vispy/examples/basics/visuals/image_transforms.py",
+		"/Users/bollu/Library/Application Support/Sublime Text 3/Packages/Default/Default (OSX).sublime-keymap",
+		"/Users/bollu/Library/Application Support/Sublime Text 3/Packages/User/Default (OSX).sublime-keymap"
+	],
+	"find":
+	{
+		"height": 25.0
+	},
+	"find_in_files":
+	{
+		"height": 93.0,
+		"where_history":
+		[
+			"*.py"
+		]
+	},
+	"find_state":
+	{
+		"case_sensitive": false,
+		"find_history":
+		[
+			"login",
+			"try_login",
+			"create_login_card",
+			"button",
+			"'])",
+			"ReactCSSTransitionGroup",
+			"bower_components",
+			"MultiplexerPane",
+			"ReactCSSTransitionGroup",
+			"React",
+			"styles",
+			"scripts",
+			"\"React\"",
+			"uname",
+			"send_login",
+			"stretch",
+			"STRONG",
+			"self.var_w",
+			"width_min",
+			")\n",
+			"cassowary",
+			"stretch_hei",
+			"val.stretch",
+			"widths",
+			"stretch",
+			"x",
+			"xs",
+			"ys",
+			"dimgrid",
+			"vargrid",
+			"enumerate",
+			"y_max",
+			"ymax",
+			"xmax",
+			"ymax",
+			"xmax",
+			"_update_child_widget_constraints",
+			"fix",
+			"fixFn",
+			"fixers",
+			"iter_",
+			"iter",
+			"fnList",
+			"fnAppliedList",
+			"eax",
+			"grid_size",
+			"n_xs",
+			"n_ys",
+			"self.var_h",
+			"n_cols",
+			"n_rows",
+			"var_grid",
+			"self._var_grid",
+			"stretch",
+			"_need_solver_recreate",
+			"_var_grid",
+			"var_grid",
+			"widget_widths_sum",
+			"widths",
+			"required",
+			"REQUIRED",
+			"_update_child_widget_constraints",
+			"_need_solver_recreate",
+			"add_widget",
+			"widget.stretch",
+			"stretch",
+			"h_stretch_terms",
+			"widget_bottom_right",
+			"widget_bottom_left",
+			"widget_top_right",
+			"widget_right",
+			"widget_top",
+			"         ",
+			"        ",
+			"space_filler",
+			"width",
+			"self.rect",
+			"xlabel_widget",
+			"stretch",
+			"sa",
+			"self.spacing",
+			"_grid_widgets",
+			"var_w",
+			"widget",
+			"):\n",
+			"spacing",
+			"STRONG",
+			"self._var_h",
+			"_var_w",
+			"_var_w_rect",
+			"{",
+			"print",
+			"pring",
+			"width",
+			"width_min",
+			"xlabel",
+			"_var_w_rect",
+			"_recreate_child_widet_constraints",
+			"_recreate",
+			"_recrea",
+			"height",
+			"_update_child_widget_constraints",
+			"_recreate_child_widet_constraints",
+			"rect.width",
+			"ect.height",
+			"rect.width",
+			"self._solver",
+			"solver",
+			"Solver",
+			"solver",
+			"Nonðe",
+			"var_",
+			"rect.width",
+			"_recreate_child_widet_constraints",
+			"_recalculate_child_widget_params",
+			"_update_child_widgets",
+			"test_perspective_render",
+			"print",
+			"padding",
+			"max_height",
+			"min_width",
+			"max_width",
+			"min_height",
+			"stretch_h_eqn_terms",
+			"stretch_w_eqn_terms",
+			"total_h_eqns",
+			"total_w_eqns",
+			"max_height"
+		],
+		"highlight": true,
+		"in_selection": false,
+		"preserve_case": false,
+		"regex": false,
+		"replace_history":
+		[
+			"self.var_h",
+			"_BorderVisual"
+		],
+		"reverse": false,
+		"show_context": true,
+		"use_buffer2": true,
+		"whole_word": false,
+		"wrap": true
+	},
+	"groups":
+	[
+		{
+			"sheets":
+			[
+			]
+		}
+	],
+	"incremental_find":
+	{
+		"height": 25.0
+	},
+	"input":
+	{
+		"height": 33.0
+	},
+	"layout":
+	{
+		"cells":
+		[
+			[
+				0,
+				0,
+				1,
+				1
+			]
+		],
+		"cols":
+		[
+			0.0,
+			1.0
+		],
+		"rows":
+		[
+			0.0,
+			1.0
+		]
+	},
+	"menu_visible": true,
+	"output.find_results":
+	{
+		"height": 0.0
+	},
+	"pinned_build_system": "",
+	"project": "cyberhawk-2k15-new.sublime-project",
+	"replace":
+	{
+		"height": 46.0
+	},
+	"save_all_on_build": true,
+	"select_file":
+	{
+		"height": 0.0,
+		"last_filter": "",
+		"selected_items":
+		[
+			[
+				"gulpfil",
+				"gulpfile.js"
+			],
+			[
+				"gulp",
+				"gulpfile.js"
+			],
+			[
+				"app.",
+				"src/js/app.js"
+			],
+			[
+				".git",
+				".gitignore"
+			],
+			[
+				"raised-bu",
+				"dist/js/material-ui/raised-button.js"
+			],
+			[
+				"gulpfi",
+				"gulpfile.js"
+			],
+			[
+				"app",
+				"src/js/app.js"
+			],
+			[
+				"react",
+				"src/js/react.jsx"
+			],
+			[
+				"index",
+				"src/index.html"
+			],
+			[
+				"react.",
+				"src/jsx/react.jsx"
+			],
+			[
+				"gulpfile",
+				"gulpfile.js"
+			],
+			[
+				"react.jsx",
+				"src/jsx/react.jsx"
+			],
+			[
+				"gird",
+				"vispy/visuals/gridlines.py"
+			],
+			[
+				"grid",
+				"vispy/scene/widgets/grid.py"
+			],
+			[
+				"widget",
+				"vispy/scene/widgets/widget.py"
+			],
+			[
+				"grid_b",
+				"examples/basics/plotting/grid_basic.py"
+			],
+			[
+				"grid_",
+				"examples/basics/plotting/grid_basic.py"
+			],
+			[
+				"grid-bas",
+				"examples/basics/plotting/grid-basic.py"
+			],
+			[
+				"vispy/grid",
+				"vispy/scene/widgets/grid.py"
+			],
+			[
+				"plotwi",
+				"vispy/plot/plotwidget.py"
+			],
+			[
+				"clorbar",
+				"vispy/scene/widgets/colorbar.py"
+			],
+			[
+				"widgetsgrid",
+				"vispy/scene/widgets/grid.py"
+			],
+			[
+				"widgets/grid",
+				"vispy/scene/widgets/grid.py"
+			],
+			[
+				"rect",
+				"vispy/geometry/rect.py"
+			],
+			[
+				"scatt",
+				"examples/basics/plotting/scatter_histogram.py"
+			],
+			[
+				"plotw",
+				"vispy/plot/plotwidget.py"
+			],
+			[
+				"examples/basics/plot",
+				"examples/basics/plotting/plot.py"
+			],
+			[
+				"plot",
+				"examples/basics/plotting/plot.py"
+			],
+			[
+				"test_pe",
+				"vispy/scene/cameras/tests/test_perspective.py"
+			],
+			[
+				".tra",
+				".travis.yml"
+			],
+			[
+				"widge",
+				"vispy/scene/widgets/widget.py"
+			],
+			[
+				"grid.py",
+				"examples/basics/scene/grid.py"
+			],
+			[
+				"examples/basics/visuals/color",
+				"examples/basics/visuals/colorbar_visual.py"
+			],
+			[
+				"plotwid",
+				"vispy/plot/plotwidget.py"
+			],
+			[
+				"colorbar",
+				"vispy/visuals/colorbar.py"
+			],
+			[
+				"testing/runn",
+				"vispy/testing/_runners.py"
+			],
+			[
+				"colorbar_vis",
+				"examples/basics/visuals/colorbar_visual_types.py"
+			],
+			[
+				"colormap",
+				"vispy/color/colormap.py"
+			],
+			[
+				"examples/plot",
+				"examples/demo/plot/plot.py"
+			],
+			[
+				"basics/plot",
+				"examples/basics/plotting/plot.py"
+			],
+			[
+				"axis",
+				"vispy/visuals/axis.py"
+			],
+			[
+				"grid.p",
+				"examples/basics/scene/grid.py"
+			],
+			[
+				"ext/cass",
+				"vispy/ext/cassowary.py"
+			],
+			[
+				"travs",
+				".travis.yml"
+			],
+			[
+				"scene/grid",
+				"examples/basics/scene/grid.py"
+			],
+			[
+				"gri",
+				"vispy/visuals/gridlines.py"
+			],
+			[
+				"color_tyes",
+				"examples/basics/visuals/colorbar_visual_types.py"
+			],
+			[
+				"border",
+				"vispy/visuals/border.py"
+			],
+			[
+				"test_colorbar",
+				"vispy/visuals/tests/test_colorbar.py"
+			],
+			[
+				"examplecolorbar",
+				"examples/basics/visuals/colorbar_visual.py"
+			],
+			[
+				"colorbarei",
+				"examples/basics/scene/colorbar_widget.py"
+			],
+			[
+				"colorbarv",
+				"examples/basics/visuals/colorbar_visual_types.py"
+			],
+			[
+				"colorbar_visua",
+				"examples/basics/visuals/colorbar_visual.py"
+			],
+			[
+				"bord",
+				"vispy/visuals/border.py"
+			],
+			[
+				"colorma",
+				"vispy/color/colormap.py"
+			],
+			[
+				"volorbar",
+				"vispy/visuals/colorbar.py"
+			]
+		],
+		"width": 0.0
+	},
+	"select_project":
+	{
+		"height": 500.0,
+		"last_filter": "",
+		"selected_items":
+		[
+			[
+				"cyber",
+				"~/prog/cyberhawk/cyberhawk.sublime-workspace"
+			],
+			[
+				"cyb",
+				"~/prog/cyberhawk/cyberhawk.sublime-workspace"
+			],
+			[
+				"",
+				"~/prog/cyberhawk/cyberhawk.sublime-workspace"
+			]
+		],
+		"width": 380.0
+	},
+	"select_symbol":
+	{
+		"height": 0.0,
+		"last_filter": "",
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"selected_group": 0,
+	"settings":
+	{
+	},
+	"show_minimap": true,
+	"show_open_files": true,
+	"show_tabs": true,
+	"side_bar_visible": true,
+	"side_bar_width": 309.0,
+	"status_bar_visible": true,
+	"template_settings":
+	{
+	}
+}
