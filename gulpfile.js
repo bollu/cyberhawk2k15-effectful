@@ -2,6 +2,7 @@ var gulp = require('gulp'),
     sass = require('gulp-ruby-sass'),
     minifycss = require('gulp-minify-css'),
     uglify = require('gulp-uglify'),
+    notify = require('gulp-notify'),
     //livereload = require('gulp-livereload'),
     webserver = require('gulp-webserver'),
     merge = require('merge-stream'),
@@ -50,16 +51,16 @@ gulp.task('scripts', function() {
     var js = gulp.src('src/js/**/*.js')
         .pipe(gulp.dest('dist/js'))
         .pipe(notify({
-            message: 'JSX files built'
+            message: 'JS files built'
         }));
 
-    var es6 = gulp.src("src/js/*.js")
+    var ts = gulp.src("src/js/*.ts")
+        .pipe()
         .pipe(uglify())
         .pipe(gulp.dest("dist/js"));
 
 
-    return merge(react_basic, react_with_addons, typedjs, jquery,
-        react_motion, favico, require, material_ui, material_ui, jsx, app);
+    return merge(js, es6);
 
 });
 
