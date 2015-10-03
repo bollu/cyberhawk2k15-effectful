@@ -31,19 +31,22 @@ function popup_toast(string) {
 function send_request_to_server(request_name, data, callback) {
     var REQUEST_URL = "http://iecsemanipal.com/cyberhawk/api";
     var API_KEY = "fUJxtW62tresIB7m";
-    data['API_KEY'] = API_KEY;
+    data["API_KEY"] = API_KEY;
     data["REQUEST"] = request_name;
+    data["SECURITY"] = "OFF";
 
-    console.log("sending request: ");
-    console.log(data);
+    console.log("sending request (" + request_name + ")", data);
+    console.log("stringified: ", jQuery.param(data))
 
     var requestFn = function() {
-        $.get(REQUEST_URL, data)
-            .done(function(data) {
-                callback(data)
+        $.post(REQUEST_URL, data)
+            .done(function(response) {
+                response = JSON.parse(response);
+                callback && callback(response);
             })
-            .fail(function() {
-                callback(data)
+            .fail(function(respose) {
+                response = JSON.parse(response);
+                callback && callback(response);
             });
     };
     setTimeout(requestFn, 1000);
@@ -51,11 +54,11 @@ function send_request_to_server(request_name, data, callback) {
 
 var REQUESTS = {
     //calls callback with true for successful login, false for unsucessful login
-    login: function(username, password, callback) {
+    login: function(email, password, callback) {
         data = {}
-        data["USERNAME"] = username;
+        data["EMAIL"] = email;
         data["PASSWORD"] = password;
-        send_request_to_server("login", data, callback)
+        send_request_to_server("playerLogin", data, callback)
     },
 
     register: function(data, callback) {
@@ -66,7 +69,9 @@ var REQUESTS = {
     logout: function(username) {
         data = {}
         data["USERNAME"] = username;
-        send_request_to_server("logout", data);
+        send_request_to_server("logout", data, function() {
+            console.log("logged out");
+        });
     },
 
     answer: function(answer, callback) {
@@ -79,11 +84,10 @@ var REQUESTS = {
         }, 500);
     },
 
-    next_question: function(callback) {
-        setTimeout(function() {
-            questions = ["what is the sun?", "what is the moon?", "what are the stars"];
-            callback(questions[Math.floor(Math.random() * questions.length)]);
-        }, 500);
+    next_question: function(uuid, callback) {
+        data = {}
+        data["sessionID"] = uuid;
+        send_request_to_server("getQuestion", data, callback);
     }
 
 }
@@ -99,6 +103,7 @@ var STATE = {
     questionNumber: 1,
     top_card: null,
     showing_hints: true,
+    uuud: null,
 
 
     switch_card_anim: function(new_top) {
@@ -127,12 +132,12 @@ var STATE = {
         this.login_card_elem.login_progress.indeterminate = true;
     },
 
-    error_login: function() {
+    error_login: function(error_message) {
         this.login_card_elem.login_button.disabled = false;
         this.login_card_elem.login_progress.indeterminate = false;
         this.login_card_elem.login_progress.value = 0;
 
-        popup_toast("Wrong username or password");
+        popup_toast(error_message);
     },
 
     try_register: function() {
@@ -277,7 +282,7 @@ function create_question_card(content) {
         STATE.try_answer(submit_button, question_progress);
         REQUESTS.answer(answer_input.value, function(correct) {
             if (correct) {
-                REQUESTS.next_question(function(question) {
+                REQUESTS.next_question(STATE.uuid, function(question) {
                     var question_card = create_question_card(question);
                     STATE.switch_card_anim(question_card);
                 });
@@ -320,8 +325,8 @@ function create_login_card(cssScene) {
     var header = create_header("h1", "Cyberhawk");
     login_form.appendChild(header);
 
-    var uname_input = create_input("username");
-    login_form.appendChild(uname_input);
+    var email_input = create_input("E-mail id");
+    login_form.appendChild(email_input);
 
     var password_input = create_input("password");
     password_input.setAttribute("type", "password")
@@ -347,22 +352,36 @@ function create_login_card(cssScene) {
     //login onclick
     login_form.onsubmit = login_button.onclick = function(e) {
         e.preventDefault();
-
         STATE.try_login();
 
-        REQUESTS.login(uname_input.value, password_input.value, function(success) {
-            if (success) {
-                REQUESTS.next_question(function(question) {
+        if (email_input.value === "") {
+            STATE.error_login("enter E-mail id");
+            return;
+        };
+        if (password_input.value === "") {
+            STATE.error_login("enter password");
+        };
+        REQUESTS.login(email_input.value, password_input.value, function(response) {
+
+            if (response["data"] === "PARAMS-INVALID" ||
+                response["data"] === "LOGIN-INVALID") {
+                STATE.error_login("wrong username or password");
+
+            } else {
+                console.log("response from login: ", response);
+                STATE.uuid = response["uuid"];
+                console.log("UUID: ", STATE.uuid);
+
+                REQUESTS.next_question(STATE.uuid, function(response) {
+                    console.log("next question: ", response);
+                    question = "foobarrquxx";
                     var question_card = create_question_card(question);
                     console.log(question_card);
                     STATE.switch_card_anim(question_card);
                     STATE.show_profile();
-
                     STATE.show_hints();
-                    //STATE.hide_card(STATE.rules_card_obj);
                 });
-            } else {
-                STATE.error_login();
+
             }
         });
     }
@@ -599,7 +618,6 @@ function create_register_card() {
 
 
         REQUESTS.register(data, function(response) {
-            response = JSON.parse(response);
             if (response["data"] === "PARAMS-INVALID") {
                 STATE.error_register("invalid register info");
 
@@ -657,6 +675,15 @@ function init() {
     create_profile_card(cssScene);
     create_hints_card(cssScene);
     create_rules_card(cssScene);
+
+    function make_register_slide_up() {
+        STATE.register_card_obj.position.y = -2000;
+        var slide_up_tween = new TWEEN.Tween(STATE.register_card_obj.position).to({
+            y: 0
+        }).easing(TWEEN.Easing.Cubic.Out);
+        slide_up_tween.start();
+    };
+    make_register_slide_up();
 };
 
 
