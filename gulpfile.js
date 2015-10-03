@@ -6,7 +6,8 @@ var gulp = require('gulp'),
     //livereload = require('gulp-livereload'),
     webserver = require('gulp-webserver'),
     merge = require('merge-stream'),
-    babel = require('gulp-babel');
+    babel = require('gulp-babel'),
+    ts = require('gulp-typescript');
 
 
 gulp.task('html', function() {
@@ -46,7 +47,7 @@ gulp.task('css', function() {
 });
 
 
-gulp.task('scripts', function() {
+gulp.task('js', function() {
 
     var js = gulp.src('src/js/**/*.js')
         .pipe(gulp.dest('dist/js'))
@@ -54,38 +55,42 @@ gulp.task('scripts', function() {
             message: 'JS files built'
         }));
 
-    var ts = gulp.src("src/js/*.ts")
-        .pipe()
-        .pipe(uglify())
-        .pipe(gulp.dest("dist/js"));
+    var ts_project = ts.createProject('tsconfig.json');
+
+    var ts_result = ts_project.src()
+        .pipe(ts(ts_project));
+
+    var ts_code = ts_result.js.pipe(uglify())
+        .pipe(gulp.dest("")) //because the tsproject file knows how to handle it
+        .pipe(notify({
+            message: "TS files built"
+        }));
 
 
-    return merge(js, es6);
+    return merge(js, ts_code);
 
 });
 
 gulp.task('bower', function() {
-    return gulp.src("bower_components")
-        .pipe(gulp.dest("dist"));
+    return gulp.src("bower_components/**/*.*")
+        .pipe(gulp.dest("dist/bower_components"));
 })
 gulp.task('watch', function() {
-    // Create LiveReload server
-    //livereload.listen();
     gulp.watch("src/**/*.html", ['html']);
     // Watch .scss files
     gulp.watch('src/css/**/*.scss', ['css']);
-    // Watch .jsx files
-    gulp.watch('src/js/**/*.js*', ['scripts']);
+    // Watch .js files
+    gulp.watch('src/js/**/*.js', ['js']);
+    //Watch .ts files
+    gulp.watch('src/js/**/*.ts', ['js']);
     //Watch font files
     gulp.watch('src/fonts/**/*.*', ['fonts']);
     //Watch bower_components
     gulp.watch('bower_components/', ['bower']);
-    // Watch any files in dist/, reload on change
-    //gulp.watch(['dist/**']).on('change', livereload.changed);
 
 });
 
-gulp.task('default', ['html', 'fonts', 'css', 'scripts', 'webserver']);
+gulp.task('default', ['html', 'fonts', 'css', 'js', 'bower', 'webserver']);
 
 
 gulp.task('webserver', ['watch'], function() {
