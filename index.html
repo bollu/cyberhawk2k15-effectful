@@ -38,7 +38,7 @@ var REQUESTS = {
             } else {
                 callback(false);
             }
-        }, 2000);
+        }, 500);
     },
 
     logout: function() {
@@ -52,14 +52,14 @@ var REQUESTS = {
             } else {
                 callback(false);
             }
-        }, 2000);
+        }, 500);
     },
 
     next_question: function(callback) {
         setTimeout(function() {
             questions = ["what is the sun?", "what is the moon?", "what are the stars"];
             callback(questions[Math.floor(Math.random() * questions.length)]);
-        }, 2000);
+        }, 500);
     }
 
 }
@@ -67,6 +67,7 @@ var REQUESTS = {
 var STATE = {
     questionNumber: 1,
     top_card: null,
+    showing_hints: true,
 
     switch_card_anim: function(new_top) {
         var old_top = this.top_card;
@@ -115,24 +116,39 @@ var STATE = {
         popup_toast("Wrong answer. Please try again");
     },
 
-    show_profile: function() {
-        this.profile_card_obj.position.y = -1000;
-        // this.profile_card_obj.position.x = 400;
-        var show_profile_tween = new TWEEN.Tween(this.profile_card_obj.position).to({
+    hide_card: function(card_obj, delay) {
+        delay = delay == undefined ? 0 : delay;
+        var hide_tween = new TWEEN.Tween(card_obj.position).to({
+            y: -1000
+        }).easing(TWEEN.Easing.Cubic.In);
+        hide_tween.delay(delay).start();
+
+    },
+
+    show_card: function(card_obj, delay) {
+        var show_tween = new TWEEN.Tween(card_obj.position).to({
             y: 0
         }).easing(TWEEN.Easing.Cubic.Out);;
-        show_profile_tween.delay(200).start();
+        show_tween.delay(delay).start();
+    },
+
+    show_profile: function() {
+        this.show_card(this.profile_card_obj, 200);
     },
 
     hide_profile: function() {
-        this.profile_card_obj.position.y = 0;
-        //this.profile_card_obj.position.x = 400;
-
-        var hide_profile_tween = new TWEEN.Tween(this.profile_card_obj.position).to({
-            y: -1000
-        }).easing(TWEEN.Easing.Cubic.In);
-        hide_profile_tween.delay(200).start();
+        this.hide_card(this.profile_card_obj, 200)
     },
+
+    show_hints: function() {
+        this.show_card(this.hints_card_obj, 300);
+    },
+
+    hide_hints: function() {
+        this.hide_card(this.hints_card_obj, 300);
+        this.hide_card(this.rules_card_obj, 300);
+    },
+
 
     logout: function() {
         //logout_button.disabled = true;
@@ -286,6 +302,9 @@ function create_login_card(cssScene) {
                     console.log(question_card);
                     STATE.switch_card_anim(question_card);
                     STATE.show_profile();
+
+                    STATE.show_hints();
+                    //STATE.hide_card(STATE.rules_card_obj);
                 });
             } else {
                 STATE.error_login();
@@ -337,6 +356,8 @@ function create_profile_card() {
         STATE.switch_card_anim(STATE.login_card_obj);
         STATE.hide_profile();
 
+        STATE.hide_card(STATE.hints_card_obj);
+        STATE.hide_card(STATE.rules_card_obj);
     }
 
     var card_obj = create_css3d_obj(card_elem);
@@ -354,6 +375,13 @@ function create_hints_card() {
     var card_elem = document.createElement("paper-material");
     card_elem.setAttribute("class", "card");
     card_elem.setAttribute("style", "width: 25%; height: 80%");
+
+    $(card_elem).click(function() {
+        console.log("hints clicked");
+        STATE.hide_card(STATE.hints_card_obj);
+        STATE.show_card(STATE.rules_card_obj, 1000);
+    });
+
     attach_ripple(card_elem);
 
     var hints_container = document.createElement("div");
@@ -368,11 +396,41 @@ function create_hints_card() {
     hints_container.setAttribute("class", "hints-container");
 
     var card_obj = create_css3d_obj(card_elem);
+    card_obj.position.y = -1000;
+
     cssScene.add(card_obj);
 
     STATE.hints_card_obj = card_obj;
     STATE.hints_card_elem = card_elem;
+}
 
+function create_rules_card() {
+    var card_elem = document.createElement("paper-material");
+    card_elem.setAttribute("class", "card");
+    card_elem.setAttribute("style", "width: 25%; height: 80%");
+
+    $(card_elem).click(function() {
+        console.log("rules clicked");
+        STATE.hide_card(STATE.rules_card_obj);
+        STATE.show_card(STATE.hints_card_obj, 1000);
+    });
+    attach_ripple(card_elem);
+
+    var rules_container = document.createElement("div");
+    rules_container.setAttribute("class", "rules-container");
+    card_elem.appendChild(rules_container);
+
+    var rules_header = create_header("h3", "Rules");
+    rules_container.appendChild(rules_header);
+
+    var card_obj = create_css3d_obj(card_elem);
+    card_obj.position.z = -2;
+    card_obj.position.y = -1000;
+
+    cssScene.add(card_obj);
+
+    STATE.rules_card_obj = card_obj;
+    STATE.rules_card_elem = card_elem;
 }
 
 //SETUP SCENE
@@ -400,6 +458,7 @@ document.body.appendChild(toastElement);
 create_login_card(cssScene);
 create_profile_card(cssScene);
 create_hints_card(cssScene);
+create_rules_card(cssScene);
 
 var render = function(time) {
     requestAnimationFrame(render);
@@ -415,6 +474,7 @@ window.onresize = function() {
 
     STATE.profile_card_obj.position.x = window.innerWidth * 0.35;
     STATE.hints_card_obj.position.x = -window.innerWidth * 0.35;
+    STATE.rules_card_obj.position.x = -window.innerWidth * 0.35;
     console.log("resized!");
 };
 window.onresize();
@@ -436,7 +496,7 @@ canvas {
 
 .card {
     width: 40%;
-    height: 80%;
+    height: 90%;
     background-color: #24263D;
     color: #dfdfdf;
 }
@@ -522,10 +582,11 @@ paper-input-container label {
 
 
 /*
-hints
-*/
+   hints
+ */
 
-.hints-container {
+.hints-container,
+.rules-container {
     padding-top: 10%;
     padding-bottom: 30%;
     padding-left: 10%;
