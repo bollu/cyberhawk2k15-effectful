@@ -13,7 +13,6 @@
 <!--script src="js/tweenjs.js"></script-->
 <script src="js/jquery.js"></script>
 <script src="js/tween-lib.js"></script>
-<script src="js/index.js"></script>
 <script src="bower_components/webcomponentsjs/webcomponents-lite.min.js"></script>
 <link rel="import" href="bower_components/paper-button/paper-button.html">
 <link rel="import" href="bower_components/paper-input/paper-input.html">
@@ -29,21 +28,45 @@ function popup_toast(string) {
     toast.show();
 }
 
+function send_request_to_server(request_name, data, callback) {
+    var REQUEST_URL = "http://iecsemanipal.com/cyberhawk/api";
+    var API_KEY = "fUJxtW62tresIB7m";
+    data['API_KEY'] = API_KEY;
+    data["REQUEST"] = request_name;
+
+    console.log("sending request: ");
+    console.log(data);
+
+    var requestFn = function() {
+        $.get(REQUEST_URL, data)
+            .done(function(data) {
+                callback(data)
+            })
+            .fail(function() {
+                callback(data)
+            });
+    };
+    setTimeout(requestFn, 1000);
+}
 
 var REQUESTS = {
     //calls callback with true for successful login, false for unsucessful login
     login: function(username, password, callback) {
-        setTimeout(function() {
-            if (username == "admin") {
-                callback(true);
-            } else {
-                callback(false);
-            }
-        }, 500);
+        data = {}
+        data["USERNAME"] = username;
+        data["PASSWORD"] = password;
+        send_request_to_server("login", data, callback)
     },
 
-    logout: function() {
+    register: function(data, callback) {
+        send_request_to_server("register", data, callback);
 
+    },
+
+    logout: function(username) {
+        data = {}
+        data["USERNAME"] = username;
+        send_request_to_server("logout", data);
     },
 
     answer: function(answer, callback) {
@@ -101,8 +124,22 @@ var STATE = {
         this.login_card_elem.login_progress.indeterminate = false;
         this.login_card_elem.login_progress.value = 0;
 
-        console.log(document.querySelector('#toast'));
         popup_toast("Wrong username or password");
+    },
+
+    try_register: function() {
+        this.register_card_elem.register_button.disabled = true;
+        this.register_card_elem.register_progress.indeterminate = true;
+
+    },
+
+    error_register: function(error_message) {
+        this.register_card_elem.register_button.disabled = false;
+        this.register_card_elem.register_progress.indeterminate = false;
+        popup_toast(error_message)
+    },
+    success_register: function() {
+        popup_toast("registered successfully");
     },
 
     try_answer: function(submit_button, answer_progress) {
@@ -282,6 +319,7 @@ function create_login_card(cssScene) {
     password_input.setAttribute("type", "password")
     login_form.appendChild(password_input);
 
+
     var hidden_submit = document.createElement("input");
     hidden_submit.type = "submit";
     hidden_submit.hidden = true;
@@ -293,7 +331,9 @@ function create_login_card(cssScene) {
 
 
     //login onclick
-    login_form.onsubmit = login_button.onclick = function() {
+    login_form.onsubmit = login_button.onclick = function(e) {
+        e.preventDefault();
+
         STATE.try_login();
 
         REQUESTS.login(uname_input.value, password_input.value, function(success) {
@@ -320,7 +360,8 @@ function create_login_card(cssScene) {
     STATE.login_card_obj = card_obj;
     STATE.login_card_elem = card_elem;
 
-    STATE.top_card = card_obj;
+    card_obj.position.y = -1000;
+
 
     return card_obj;
 }
@@ -434,6 +475,139 @@ function create_rules_card() {
     STATE.rules_card_elem = card_elem;
 }
 
+function create_register_card() {
+    var card_elem = document.createElement("paper-material");
+    card_elem.setAttribute("class", "card");
+
+    var register_progress = create_progress();
+    card_elem.appendChild(register_progress);
+    card_elem.register_progress = register_progress;
+
+
+    var register_form = document.createElement("form");
+    register_form.action = "#";
+    register_form.setAttribute("class", "register-container");
+    card_elem.appendChild(register_form)
+
+    var header = create_header("h1", "Register");
+    register_form.appendChild(header);
+
+
+    var name_input = create_input("name");
+    register_form.appendChild(name_input);
+
+
+
+    var password_input = create_input("password");
+    password_input.setAttribute("type", "password")
+    register_form.appendChild(password_input);
+
+    var password_resubmit_input = create_input("retype password");
+    password_resubmit_input.setAttribute("type", "password")
+    register_form.appendChild(password_resubmit_input);
+
+
+    var email_input = create_input("E-mail");
+    register_form.appendChild(email_input);
+
+
+    var phone_input = create_input("Phone number");
+    register_form.appendChild(phone_input);
+
+
+    var college_input = create_input("College");
+    register_form.appendChild(college_input);
+
+    var hidden_submit = document.createElement("input");
+    hidden_submit.type = "submit";
+    hidden_submit.hidden = true;
+    register_form.appendChild(hidden_submit);
+
+    var register_button = create_button("Register");
+    register_form.appendChild(register_button);
+    card_elem.register_button = register_button;
+
+
+    var switch_to_login_button = create_button("Registered? Login now");
+    register_form.appendChild(switch_to_login_button);
+
+    switch_to_login_button.onclick = function() {
+        STATE.switch_card_anim(STATE.login_card_obj);
+    };
+
+    //login onclick
+    register_form.onsubmit = register_button.onclick = function(e) {
+        e.preventDefault();
+
+        STATE.try_register();
+
+        data = {};
+        data["NAME"] = name_input.value;
+        data["EMAIL"] = email_input.value;
+        data["PASSWORD"] = password_input.value;
+        data["COLLEGE"] = college_input.value;
+        data["PHONE"] = phone_input.value;
+
+        if (data["NAME"] === "") {
+            STATE.error_register("enter username");
+            return;
+        };
+
+        if (data["PASSWORD"] === "") {
+            STATE.error_register("enter password");
+            return;
+        };
+        var resubmit_password = password_resubmit_input.value;
+        if (resubmit_password === "") {
+            STATE.error_register("enter retyped password");
+            return;
+
+        }
+        var simple_email_regex = /\S+@\S+\.\S+/;
+        if (!simple_email_regex.test(data["EMAIL"])) {
+            STATE.error_register("enter valid E-mail id");
+        };
+
+        if (data["PASSWORD"] !== resubmit_password) {
+            STATE.error_register("passwords do not match");
+            return;
+        }
+        if (data["PHONE"] === "") {
+            STATE.error_register("enter the phone number");
+            return;
+        }
+        if (data["COLLEGE"] === "") {
+            STATE.error_register("enter college");
+            return;
+        };
+
+
+
+        REQUESTS.register(data, function(response) {
+            response = JSON.parse(response);
+            if (response["data"] === "PARAMS-INVALID") {
+                STATE.error_register("invalid register info");
+
+
+            } else {
+                console.log("registered");
+                STATE.success_register();
+                STATE.switch_card_anim(STATE.login_card_obj);
+            }
+        });
+    }
+
+    var card_obj = create_css3d_obj(card_elem);
+    cssScene.add(card_obj);
+
+    //store it in STATE
+    STATE.register_card_obj = card_obj;
+    STATE.register_card_elem = card_elem;
+
+    STATE.top_card = card_obj;
+
+    return card_obj;
+}
 //SETUP SCENE
 var cssScene = new THREE.Scene();
 var camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
@@ -456,10 +630,12 @@ toastElement.setAttribute("duration", "5000");
 document.body.appendChild(toastElement);
 
 
+create_register_card(cssScene);
 create_login_card(cssScene);
 create_profile_card(cssScene);
 create_hints_card(cssScene);
 create_rules_card(cssScene);
+
 
 var render = function(time) {
     requestAnimationFrame(render);
@@ -515,6 +691,7 @@ paper-progress {
 
 /* login */
 
+.register-container,
 .login-container,
 .question-container {
     padding-top: 20%;
