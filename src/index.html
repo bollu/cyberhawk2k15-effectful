@@ -31,9 +31,9 @@ function popup_toast(string) {
 function send_request_to_server(request_name, data, callback) {
     var REQUEST_URL = "http://iecsemanipal.com/cyberhawk/api";
     var API_KEY = "fUJxtW62tresIB7m";
-    data["API_KEY"] = API_KEY;
+    //data["API_KEY"] = API_KEY;
     data["REQUEST"] = request_name;
-    data["SECURITY"] = "OFF";
+    //data["SECURITY"] = "OFF";
 
     console.log("sending request (" + request_name + ")", data);
     console.log("stringified: ", jQuery.param(data))
@@ -41,10 +41,13 @@ function send_request_to_server(request_name, data, callback) {
     var requestFn = function() {
         $.post(REQUEST_URL, data)
             .done(function(response) {
+                console.log("response: ", response);
                 response = JSON.parse(response);
                 callback && callback(response);
             })
             .fail(function(respose) {
+                console.log("response: ", response);
+
                 response = JSON.parse(response);
                 callback && callback(response);
             });
@@ -687,10 +690,41 @@ function init() {
 };
 
 
+function create_spring(initial_val) {
+
+    function setter_fn(value) {
+        this.target = value;
+    }
+
+    function getter_fn(value) {
+        return this.current;
+    }
+
+    function step(dt) {
+        //a = -k * x - w * v;
+        var x = this.target - this.current;
+        var a = -1.0 * x - 1.0 * this.v;
+
+        this.v += a * dt;
+        this.current += this.v * dt + 0.5 * a * dt * dt;
+    }
+    var spring_system = {
+        target: initial_val || 0,
+        current: 0,
+        v: 0,
+        a: 0,
+
+        set: setter_fn.bind(spring_system),
+        get: getter_fn.bind(spring_system),
+        step: step_fn.bind(spring_system)
+    };
+    return spring_system;
+}
+
 function create_mouse_position_tracker() {
     GLOBALS.mousePos = {
         x: 0,
-        y: 0
+        y: 0,
     };
 
     $(document).mousemove(function(event) {
