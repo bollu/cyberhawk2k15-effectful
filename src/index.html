@@ -2,6 +2,8 @@
 
 <head>
     <title> Cyberhawk 2015</title>
+    <meta content='width=device-width; initial-scale=1.0; maximum-scale=1.0; user-scalable=0;' name='viewport' />
+    <meta name="viewport" content="width=device-width" />
 </head>
 <!-- body -->
 
@@ -44,14 +46,17 @@ function send_request_to_server(request_name, data, callback) {
                 url: REQUEST_URL,
                 data: data,
             }).done(function(response) {
-                console.log("response for (" + request_name + "): ", response);
                 response = JSON.parse(response);
+                response.success = true;
+                console.log("response for (" + request_name + "): ", response);
+
                 callback && callback(response);
             })
             .fail(function(respose) {
-                console.log("response for (" + request_name + "): ", response);
-
                 response = JSON.parse(response);
+                response.success = false;
+
+                console.log("response for (" + request_name + "): ", response);
                 callback && callback(response);
             });
     };
@@ -138,27 +143,30 @@ var STATE = {
 
         var hide_tween = new TWEEN.Tween(old_top.position)
             .to({
-                z: -100
+                z: -100,
+                y: -2000,
             }, 500)
             .easing(TWEEN.Easing.Cubic.In);
 
-        var show_question_tween = new TWEEN.Tween(new_top.position).to({
+        var show_tween = new TWEEN.Tween(new_top.position).to({
             y: 0
         }).easing(TWEEN.Easing.Cubic.Out);;
 
         hide_tween.start();
-        show_question_tween.delay(100).start();
+        show_tween.delay(100).start();
         this.top_card = new_top;
     },
 
     try_login: function() {
         this.login_card_elem.login_button.disabled = true;
+        this.login_card_elem.goto_register_button.disabled = true;
         this.profile_card_elem.logout_button.disabled = false;
         this.login_card_elem.login_progress.indeterminate = true;
     },
 
     error_login: function(error_message) {
         this.login_card_elem.login_button.disabled = false;
+        this.login_card_elem.goto_register_button.disabled = false;
         this.login_card_elem.login_progress.indeterminate = false;
         this.login_card_elem.login_progress.value = 0;
 
@@ -167,24 +175,34 @@ var STATE = {
 
     success_login: function() {
         this.login_card_elem.login_button.disabled = false;
+        this.login_card_elem.goto_register_button.disabled = false;
         this.login_card_elem.login_progress.indeterminate = false;
         this.login_card_elem.login_progress.value = 0;
+
+        //enable logout buttons
+        this.profile_card_elem.logout_button.disabled = false;
         popup_toast("successfully logged in");
     },
 
     try_register: function() {
         this.register_card_elem.register_button.disabled = true;
+        this.register_card_elem.go_to_login_button.disabled = true;
         this.register_card_elem.register_progress.indeterminate = true;
 
     },
 
     error_register: function(error_message) {
         this.register_card_elem.register_button.disabled = false;
+        this.register_card_elem.go_to_login_button.disabled = false;
         this.register_card_elem.register_progress.indeterminate = false;
         popup_toast(error_message)
     },
     success_register: function() {
         popup_toast("registered successfully");
+        this.register_card_elem.register_button.disabled = false;
+        this.register_card_elem.go_to_login_button.disabled = false;
+        this.register_card_elem.register_progress.indeterminate = false;
+
     },
 
     try_answer: function(submit_button, answer_progress) {
@@ -232,6 +250,7 @@ var STATE = {
 
         REQUESTS.get_player_info(STATE.sessionID, function(response) {
             STATE.profile_card_elem.profileNameTextRegion.innerHTML = response["data"]["NAME"];
+            STATE.questionNumber = response["data"]["LEVEL"];
         });
     },
     show_hints: function() {
@@ -300,20 +319,29 @@ function create_progress() {
 }
 
 function create_question_card(content) {
-    var card_elem = document.createElement("paper-material");
+    var card_paper = document.createElement("paper-material");
+    var card_elem = document.createElement("div");
+    card_elem.setAttribute("class", "card");
+    card_paper.appendChild(card_elem);
+
     card_elem.setAttribute("class", "card");
     card_elem.setAttribute("elevation", "5");
     attach_ripple(card_elem);
     var question_progress = create_progress();
-    card_elem.appendChild(question_progress);
+    card_paper.appendChild(question_progress);
 
 
     var question_container = document.createElement("div");
     question_container.setAttribute("class", "question-container");
     card_elem.appendChild(question_container);
 
-    var question_title = create_header("h3", "Question " + STATE.questionNumber);
+    var question_title = create_header("h3", "Level " + STATE.questionNumber);
     question_container.appendChild(question_title);
+
+    REQUESTS.get_player_info(STATE.sessionID, function(response) {
+        question_title.innerHTML = "Level " + response["data"]["LEVEL"];
+    })
+
 
     var content_region = document.createElement("div");
     content_region.setAttribute("class", "content-container");
@@ -369,8 +397,11 @@ function create_question_card(content) {
 }
 
 function create_login_card(cssScene) {
-    var card_elem = document.createElement("paper-material");
+    var card_paper = document.createElement("paper-material");
+    var card_elem = document.createElement("div");
     card_elem.setAttribute("class", "card");
+    card_paper.appendChild(card_elem);
+    attach_ripple(card_elem);
 
     var login_progress = create_progress();
     card_elem.appendChild(login_progress);
@@ -404,6 +435,7 @@ function create_login_card(cssScene) {
 
     var goto_register_button = create_button("Register now");
     login_form.appendChild(goto_register_button);
+    card_elem.goto_register_button = goto_register_button;
 
 
     goto_register_button.onclick = function() {
@@ -598,8 +630,11 @@ function create_rules_card() {
 }
 
 function create_register_card() {
-    var card_elem = document.createElement("paper-material");
+    var card_paper = document.createElement("paper-material");
+    var card_elem = document.createElement("div");
     card_elem.setAttribute("class", "card");
+    card_paper.appendChild(card_elem);
+    attach_ripple(card_elem);
 
     var register_progress = create_progress();
     card_elem.appendChild(register_progress);
@@ -651,10 +686,11 @@ function create_register_card() {
     card_elem.register_button = register_button;
 
 
-    var switch_to_login_button = create_button("Go to Login");
-    register_form.appendChild(switch_to_login_button);
+    var go_to_login_button = create_button("Go to Login");
+    register_form.appendChild(go_to_login_button);
+    card_elem.go_to_login_button = go_to_login_button;
 
-    switch_to_login_button.onclick = function() {
+    go_to_login_button.onclick = function() {
         STATE.switch_card_anim(STATE.login_card_obj);
     };
 
@@ -711,7 +747,9 @@ function create_register_card() {
                 STATE.error_register("invalid register info");
 
 
-            } else {
+            } else if (response["data"] === "USER-EXISTS") {
+                STATE.error_register("user already exists");
+            } else if (response["data"] === "") {
                 console.log("registered");
                 STATE.success_register();
                 STATE.switch_card_anim(STATE.login_card_obj);
@@ -736,7 +774,19 @@ function init() {
     var cssScene = new THREE.Scene();
     GLOBALS.cssScene = cssScene;
 
-    var camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+    console.log("inner width: ", window.innerWidth, "inner height: ", window.innerHeight);
+
+    var is_desktop = (window.innerWidth > 600 && window.innerHeight > 600);
+
+    var camera = null;
+    if (!is_desktop) {
+        camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+    } else {
+        camera = new THREE.PerspectiveCamera(65, window.innerWidth / window.innerHeight, 0.5, 1000);
+        //        (new THREE.Vector3(1, 1, 0), Math.PI / 2);
+
+    };
+
     GLOBALS.camera = camera;
 
     camera.position.z = 500;
@@ -786,6 +836,10 @@ function create_spring(initial_val) {
         return this.current;
     }
 
+    function move_by_fn(value) {
+        this.target = this.current + value;
+    }
+
     function step_fn(t) {
         dt = (t - this.t) / 1000.0;
         this.t = t;
@@ -799,9 +853,21 @@ function create_spring(initial_val) {
         while (dt > 0) {
             const m = 50;
             var x = this.current - this.target;
+
             var a = (-1.0 * x - 1. * this.v) * m;
+            /*
+            if (Math.abs(a) > 200) {
+                a = 200 * (a < 0 ? -1 : 1);
+            }
+            */
 
             this.v += a * dt;
+            /*
+            if (Math.abs(this.v) > 400) {
+                this.v = 400 * (this.v < 0 ? -1 : 1);
+            }
+            */
+
             this.current += this.v * dt + 0.5 * a * dt * dt;
 
             dt -= step_time;
@@ -818,6 +884,7 @@ function create_spring(initial_val) {
     spring_system.set = setter_fn.bind(spring_system);
     spring_system.get = getter_fn.bind(spring_system);
     spring_system.step = step_fn.bind(spring_system);
+    spring_system.move_by = move_by_fn.bind(spring_system);
     return spring_system;
 }
 
@@ -833,10 +900,29 @@ function create_mouse_position_tracker() {
     });
 
 }
+
+function create_gyro_position_tracker() {
+
+    window.addEventListener("deviceorientation", function() {
+        var absolute = event.absolute;
+        var alpha = event.alpha;
+        var x_axis = event.beta;
+        var y_axis = event.gamma;
+
+        //GLOBALS.mousePos.x.set(alpha / 5.0 * window.innerWidth);
+    }, true);
+
+    window.ondevicemotion = function(event) {
+        var xVal = event.accelerationIncludingGravity.x;
+        GLOBALS.mousePos.x.move_by(100 * xVal);
+        //GLOBALS.mousePos.y.move_by(50 * yVal);
+    }
+};
 var render = function(time) {
     requestAnimationFrame(render);
     const ROTATE_FACTOR = 0.4;
 
+    var is_desktop = (window.innerWidth > 600 && window.innerHeight > 600);
 
     GLOBALS.camera.rotation.y = -ROTATE_FACTOR * (GLOBALS.mousePos.x.get() - window.innerWidth * 0.5) / window.innerWidth;
     GLOBALS.camera.rotation.x = -ROTATE_FACTOR * (GLOBALS.mousePos.y.get() - window.innerHeight * 0.5) / window.innerHeight;
@@ -862,6 +948,7 @@ window.onresize = function() {
 
 init();
 create_mouse_position_tracker();
+create_gyro_position_tracker();
 window.onresize();
 render();
 </script>
@@ -869,23 +956,36 @@ render();
 <style type="text/css">
 body {
     margin: 0;
+    padding: 0;
     font-family: "Meslo LG S DZ for Powerline" !important;
     font-weight: 200;
-}
-
-canvas {
+    overflow: hidden;
     width: 100%;
     height: 100%;
 }
 
+canvas {
+    /*
+    min-width: 100%;
+    min-height: 100%;
+    */
+    /* fix necessary to remove space at bottom of canvas */
+    display: block;
+}
+
 .card {
-    width: 40%;
-    height: 90%;
+    padding-top: 0em;
+    padding-bottom: 2em;
+    padding-left: 2em;
+    padding-right: 2em;
     background-color: #24263D;
     color: #dfdfdf;
 }
 
 paper-progress {
+    position: absolute;
+    left: 0;
+    right: 0;
     width: 100%;
 }
 
@@ -913,6 +1013,7 @@ paper-progress {
 paper-button {
     background: #5ECBEE;
     color: #dfdfdf;
+    width: 100%;
     padding-left: 10%;
     padding-right: 10%;
 }
