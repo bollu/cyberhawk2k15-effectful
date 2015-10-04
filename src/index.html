@@ -87,13 +87,28 @@ var REQUESTS = {
         send_request_to_server("checkAnswer", data, callback);
     },
 
-    next_question: function(sessionID, callback) {
+    get_question: function(sessionID, callback) {
         data = {}
         data["sessionID"] = sessionID;
         send_request_to_server("getQuestion", data, callback);
-    }
+    },
 
-}
+    get_hints: function(sessionID, callback) {
+        data = {
+            "sessionID": sessionID
+        };
+        send_request_to_server("getHints", data, callback);
+    },
+
+    get_position: function(sessionID, callback) {
+        data = {
+            "sessionID": sessionID
+        };
+        send_request_to_server("getMyPosition", data, callback);
+    },
+
+
+};
 
 var GLOBALS = {
     camera: null,
@@ -101,7 +116,7 @@ var GLOBALS = {
     cssScene: null,
     mousePos: null,
 
-}
+};
 var STATE = {
     questionNumber: 1,
     top_card: null,
@@ -194,8 +209,25 @@ var STATE = {
         this.hide_card(this.profile_card_obj, 200)
     },
 
+    update_profile: function() {
+        REQUESTS.get_position(STATE.sessionID, function(response) {
+            STATE.profile_card_elem.leadersTextRegion.innerHTML = response["data"]["leaders"];
+            STATE.profile_card_elem.onParTextRegion.innerHTML = response["data"]["same"];
+            STATE.profile_card_elem.trailersTextRegion.innerHTML = response["data"]["trailers"];
+        })
+    },
     show_hints: function() {
         this.show_card(this.hints_card_obj, 300);
+    },
+
+    update_hints: function() {
+        REQUESTS.get_hints(STATE.sessionID, function(response) {
+            STATE.hints_card_obj.hints_container.innerHTML = "";
+            for (hint in response["data"]) {
+                STATE.hints_card_elem.hints_container.innerHTML += "<a class='hint'>" + hint + "</a>";
+            };
+
+        });
     },
 
     hide_hints: function() {
@@ -290,10 +322,11 @@ function create_question_card(content) {
             var correct = response["data"] === true;
 
             if (correct) {
-                REQUESTS.next_question(STATE.sessionID, function(response) {
+                REQUESTS.get_question(STATE.sessionID, function(response) {
                     var question = response["data"]["questionText"];
                     var question_card = create_question_card(question);
                     STATE.switch_card_anim(question_card);
+                    STATE.update_hints();
                 });
             } else {
                 STATE.error_answer(submit_button, question_progress);
@@ -382,14 +415,16 @@ function create_login_card(cssScene) {
                 STATE.sessionID = response["data"]["sessionID"];
                 console.log("sessionID: ", STATE.sessionID);
 
-                REQUESTS.next_question(STATE.sessionID, function(response) {
+                REQUESTS.get_question(STATE.sessionID, function(response) {
                     console.log("next question: ", response);
                     question = response["data"]["questionText"];
                     var question_card = create_question_card(question);
                     console.log(question_card);
                     STATE.switch_card_anim(question_card);
                     STATE.show_profile();
+                    STATE.update_profile();
                     STATE.show_hints();
+                    STATE.update_hints();
                 });
 
             }
@@ -424,11 +459,34 @@ function create_profile_card() {
     profileName.setAttribute("class", "profile-name");
     profile_container.appendChild(profileName);
 
-    var leadersContainer = document.createElement("div");
-    profile_container.appendChild(leadersContainer);
+    var positionsContainer = document.createElement("div");
+    profile_container.appendChild(positionsContainer);
 
-    var leadersHeading = create_header("h5", "Leaders");
-    leadersContainer.appendChild(leadersHeading)
+    //leaders
+    var leadersHeader = create_header("h4", "Leaders");
+    positionsContainer.appendChild(leadersHeader)
+
+    var leadersTextRegion = create_header("h5", "qwer");
+    positionsContainer.appendChild(leadersTextRegion);
+    card_elem.leadersTextRegion = leadersTextRegion;
+
+    //onpar
+    var onParHeader = create_header("h4", "On Par");
+    positionsContainer.appendChild(onParHeader);
+
+    var onParTextRegion = create_header("h5", "qwer");
+    positionsContainer.appendChild(onParTextRegion);
+    card_elem.onParTextRegion = onParTextRegion;
+
+
+    //lagging
+    var trailersHeader = create_header("h4", "Trailers");
+    positionsContainer.appendChild(trailersHeader);
+
+    var trailersTextRegion = create_header("h5", "qwer");
+    positionsContainer.appendChild(trailersTextRegion);
+    card_elem.trailersTextRegion = trailersTextRegion;
+
 
 
     var logout_button = create_button("Logout");
