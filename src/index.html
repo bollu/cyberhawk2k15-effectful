@@ -704,38 +704,50 @@ function create_spring(initial_val) {
         return this.current;
     }
 
-    function step(dt) {
-        //a = -k * x - w * v;
-        var x = this.target - this.current;
-        var a = -1.0 * x - 1.0 * this.v;
+    function step_fn(t) {
+        dt = (t - this.t) / 1000.0;
+        this.t = t;
 
-        this.v += a * dt;
-        this.current += this.v * dt + 0.5 * a * dt * dt;
+        const step_time = 1.0 / 60.0;
+
+        if (dt > step_time * 10) {
+            dt = step_time;
+        }
+
+        while (dt > 0) {
+            const m = 100;
+            var x = this.current - this.target;
+            var a = (-1.0 * x - 1. * this.v) * m;
+
+            this.v += a * dt;
+            this.current += this.v * dt + 0.5 * a * dt * dt;
+
+            dt -= step_time;
+        };
     }
     var spring_system = {
-        target: initial_val || 0,
+        target: initial_val,
         current: 0,
         v: 0,
         a: 0,
-
-        set: setter_fn.bind(spring_system),
-        get: getter_fn.bind(spring_system),
-        step: step_fn.bind(spring_system)
+        t: 0,
     };
+
+    spring_system.set = setter_fn.bind(spring_system);
+    spring_system.get = getter_fn.bind(spring_system);
+    spring_system.step = step_fn.bind(spring_system);
     return spring_system;
 }
 
 function create_mouse_position_tracker() {
     GLOBALS.mousePos = {
-        x: 0,
-        y: 0,
+        x: create_spring(0),
+        y: create_spring(0),
     };
 
     $(document).mousemove(function(event) {
-        GLOBALS.mousePos = {
-            x: event.pageX,
-            y: event.pageY
-        };
+        GLOBALS.mousePos.x.set(event.pageX);
+        GLOBALS.mousePos.y.set(event.pageY);
     });
 
 }
@@ -743,11 +755,14 @@ var render = function(time) {
     requestAnimationFrame(render);
     const ROTATE_FACTOR = 0.2;
 
-    GLOBALS.camera.rotation.y = -ROTATE_FACTOR * (GLOBALS.mousePos.x - window.innerWidth * 0.5) / window.innerWidth;
-    GLOBALS.camera.rotation.x = -ROTATE_FACTOR * (GLOBALS.mousePos.y - window.innerHeight * 0.5) / window.innerHeight;
+
+    GLOBALS.camera.rotation.y = -ROTATE_FACTOR * (GLOBALS.mousePos.x.get() - window.innerWidth * 0.5) / window.innerWidth;
+    GLOBALS.camera.rotation.x = -ROTATE_FACTOR * (GLOBALS.mousePos.y.get() - window.innerHeight * 0.5) / window.innerHeight;
 
     //cssObject.rotation.x += 0.01;
     GLOBALS.cssRenderer.render(GLOBALS.cssScene, GLOBALS.camera);
+    GLOBALS.mousePos.x.step(time);
+    GLOBALS.mousePos.y.step(time);
     TWEEN.update(time);
 };
 
