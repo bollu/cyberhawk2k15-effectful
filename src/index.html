@@ -281,14 +281,17 @@ function create_question_card(content) {
     submit_form.appendChild(submit_button);
 
 
-    submit_form.onsubmit = submit_button.onclick = function() {
+    submit_form.onsubmit = submit_button.onclick = function(e) {
+        e.preventDefault();
+
         STATE.try_answer(submit_button, question_progress);
         //send answer request
         REQUESTS.answer(STATE.sessionID, answer_input.value, function(response) {
             var correct = response["data"] === true;
 
             if (correct) {
-                REQUESTS.next_question(STATE.sessionID, function(question) {
+                REQUESTS.next_question(STATE.sessionID, function(response) {
+                    var question = response["data"]["questionText"];
                     var question_card = create_question_card(question);
                     STATE.switch_card_anim(question_card);
                 });
@@ -715,7 +718,7 @@ function create_spring(initial_val) {
         }
 
         while (dt > 0) {
-            const m = 100;
+            const m = 50;
             var x = this.current - this.target;
             var a = (-1.0 * x - 1. * this.v) * m;
 
@@ -753,7 +756,7 @@ function create_mouse_position_tracker() {
 }
 var render = function(time) {
     requestAnimationFrame(render);
-    const ROTATE_FACTOR = 0.2;
+    const ROTATE_FACTOR = 0.4;
 
 
     GLOBALS.camera.rotation.y = -ROTATE_FACTOR * (GLOBALS.mousePos.x.get() - window.innerWidth * 0.5) / window.innerWidth;
