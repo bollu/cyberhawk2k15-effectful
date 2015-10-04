@@ -259,9 +259,10 @@ var STATE = {
 
     update_hints: function() {
         REQUESTS.get_hints(STATE.sessionID, function(response) {
-            STATE.hints_card_elem.hints_container.innerHTML = "";
-            for (hint in response["data"]) {
-                STATE.hints_card_elem.hints_container.innerHTML += "<a class='hint'>" + hint + "</a>";
+            for (var i = 0; i < response["data"].length; i++) {
+                var hint = response["data"][i];
+                console.log("~~hints: ", hint);
+                STATE.hints_card_elem.hintTextRegion[i].innerHTML += hint;
             };
 
         });
@@ -328,7 +329,7 @@ function create_question_card(content) {
     card_elem.setAttribute("elevation", "5");
     attach_ripple(card_elem);
     var question_progress = create_progress();
-    card_paper.appendChild(question_progress);
+    card_elem.appendChild(question_progress);
 
 
     var question_container = document.createElement("div");
@@ -476,6 +477,7 @@ function create_login_card(cssScene) {
                     STATE.update_profile();
                     STATE.show_hints();
                     STATE.update_hints();
+
                 });
 
             }
@@ -516,6 +518,7 @@ function create_profile_card() {
 
     //leaders
     var leadersHeader = create_header("h4", "Leaders");
+    leadersHeader.setAttribute("class", "profile-header");
     positionsContainer.appendChild(leadersHeader)
 
     var leadersTextRegion = create_header("h5", "qwer");
@@ -524,6 +527,7 @@ function create_profile_card() {
 
     //onpar
     var onParHeader = create_header("h4", "On Par");
+    onParHeader.setAttribute("class", "profile-header");
     positionsContainer.appendChild(onParHeader);
 
     var onParTextRegion = create_header("h5", "qwer");
@@ -533,6 +537,7 @@ function create_profile_card() {
 
     //lagging
     var trailersHeader = create_header("h4", "Trailers");
+    trailersHeader.setAttribute("class", "profile-header");
     positionsContainer.appendChild(trailersHeader);
 
     var trailersTextRegion = create_header("h5", "qwer");
@@ -579,17 +584,26 @@ function create_hints_card() {
 
     attach_ripple(card_elem);
 
+
+
     var hints_container = document.createElement("div");
     hints_container.setAttribute("class", "hints-container");
     card_elem.appendChild(hints_container);
     card_elem.hints_container = hints_container;
 
-
     var hints_header = create_header("h3", "Hints");
     hints_container.appendChild(hints_header);
 
-    var hints_container = document.createElement("div");
-    hints_container.setAttribute("class", "hints-container");
+    card_elem.hintTextRegion = [];
+
+    for (var i = 0; i < 3; i++) {
+        var hintRegion = document.createElement("div");
+        hintRegion.setAttribute("class", "hint-region");
+        hints_container.appendChild(hintRegion);
+        card_elem.hintTextRegion.push(hintRegion);
+    }
+
+
 
     var card_obj = create_css3d_obj(card_elem);
     card_obj.position.y = -1000;
@@ -630,7 +644,11 @@ function create_rules_card() {
 }
 
 function create_register_card() {
-    var card_paper = document.createElement("paper-material");
+    var card_paper = document.createElement("paper-card");
+    card_paper.setAttribute("elevation", "5");
+    card_paper.setAttribute("animatedShadow", "true");
+
+
     var card_elem = document.createElement("div");
     card_elem.setAttribute("class", "card");
     card_paper.appendChild(card_elem);
@@ -776,16 +794,9 @@ function init() {
 
     console.log("inner width: ", window.innerWidth, "inner height: ", window.innerHeight);
 
-    var is_desktop = (window.innerWidth > 600 && window.innerHeight > 600);
 
     var camera = null;
-    if (!is_desktop) {
-        camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-    } else {
-        camera = new THREE.PerspectiveCamera(65, window.innerWidth / window.innerHeight, 0.5, 1000);
-        //        (new THREE.Vector3(1, 1, 0), Math.PI / 2);
-
-    };
+    camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
 
     GLOBALS.camera = camera;
 
@@ -796,7 +807,8 @@ function init() {
     cssRenderer.setSize(window.innerWidth, window.innerHeight);
     cssRenderer.domElement.style.position = 'absolute';
     cssRenderer.domElement.style.top = 0;
-    cssRenderer.domElement.style.background = '#161928';
+    //cssRenderer.domElement.style.background = '#161928';
+    cssRenderer.domElement.style.background = '#EFEFEF';
 
     document.body.appendChild(cssRenderer.domElement);
 
@@ -920,9 +932,7 @@ function create_gyro_position_tracker() {
 };
 var render = function(time) {
     requestAnimationFrame(render);
-    const ROTATE_FACTOR = 0.4;
-
-    var is_desktop = (window.innerWidth > 600 && window.innerHeight > 600);
+    const ROTATE_FACTOR = 0.25;
 
     GLOBALS.camera.rotation.y = -ROTATE_FACTOR * (GLOBALS.mousePos.x.get() - window.innerWidth * 0.5) / window.innerWidth;
     GLOBALS.camera.rotation.x = -ROTATE_FACTOR * (GLOBALS.mousePos.y.get() - window.innerHeight * 0.5) / window.innerHeight;
@@ -954,14 +964,41 @@ render();
 </script>
 <!-- style -->
 <style type="text/css">
+@font-face {
+    font-family: 'Meslo LG S DZ';
+    src: url('css/fonts/MesloLGSDZ.ttf');
+    /* IE9 Compat Modes */
+}
+
+@font-face {
+    font-family: 'Segoe UI';
+    src: url('css/fonts/segoeui.ttf');
+    font-weight: 400;
+}
+
+@font-face {
+    font-family: 'Segoe UI';
+    src: url('css/fonts/segoeuil.ttf');
+    font-weight: 300;
+}
+
 body {
     margin: 0;
     padding: 0;
-    font-family: "Meslo LG S DZ for Powerline" !important;
+    font-family: "Meslo LG S DZ", !important;
     font-weight: 200;
     overflow: hidden;
     width: 100%;
     height: 100%;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5 {
+    font-family: "Segoe UI" !important;
+    font-weight: 300;
 }
 
 canvas {
@@ -978,7 +1015,10 @@ canvas {
     padding-bottom: 2em;
     padding-left: 2em;
     padding-right: 2em;
+    /*
     background-color: #24263D;
+    */
+    background-color: #3E7797;
     color: #dfdfdf;
 }
 
@@ -992,7 +1032,10 @@ paper-progress {
 #active-progress.paper-progress,
 #indeterminateSplitter,
 .indeterminate {
+    /*
     background-color: #6A7DD3 !important;
+    */
+    background-color: #F76138 !important;
 }
 
 
@@ -1011,8 +1054,11 @@ paper-progress {
 }
 
 paper-button {
+    /*
     background: #5ECBEE;
-    color: #dfdfdf;
+    */
+    background: #EFAC49;
+    color: #ffffff;
     width: 100%;
     padding-left: 10%;
     padding-right: 10%;
@@ -1020,11 +1066,15 @@ paper-button {
 
 .paper-input,
 label {
+    font-family: "Meslo LG S DZ" !important;
+    /*
     color: #bfbfbf !important;
+    */
+    color: #dedede !important;
 }
 
 .focused-line {
-    background: #bfbfbf !important;
+    background: #EFAC49 !important;
 }
 
 paper-input-container input,
@@ -1074,6 +1124,11 @@ paper-input-container label {
     margin-top: 20%;
 }
 
+.profile-header {
+    font-weight: 400;
+    border-bottom: 1px solid #EFEFEF;
+}
+
 
 /*
    hints
@@ -1085,6 +1140,10 @@ paper-input-container label {
     padding-bottom: 30%;
     padding-left: 10%;
     padding-right: 10%;
+}
+
+.hint-region {
+    font-family: "Segoe UI" !important;
 }
 </style>
 
