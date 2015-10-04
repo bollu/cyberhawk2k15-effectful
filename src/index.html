@@ -31,22 +31,25 @@ function popup_toast(string) {
 function send_request_to_server(request_name, data, callback) {
     var REQUEST_URL = "http://iecsemanipal.com/cyberhawk/api";
     var API_KEY = "fUJxtW62tresIB7m";
-    //data["API_KEY"] = API_KEY;
+    data["API_KEY"] = API_KEY;
     data["REQUEST"] = request_name;
-    //data["SECURITY"] = "OFF";
+    data["SECURITY"] = "OFF";
 
     console.log("sending request (" + request_name + ")", data);
-    console.log("stringified: ", jQuery.param(data))
+    //onsole.log("stringified: ", jQuery.param(data))
 
     var requestFn = function() {
-        $.post(REQUEST_URL, data)
-            .done(function(response) {
-                console.log("response: ", response);
+        $.ajax({
+                type: "GET",
+                url: REQUEST_URL,
+                data: data,
+            }).done(function(response) {
+                console.log("response for (" + request_name + "): ", response);
                 response = JSON.parse(response);
                 callback && callback(response);
             })
             .fail(function(respose) {
-                console.log("response: ", response);
+                console.log("response for (" + request_name + "): ", response);
 
                 response = JSON.parse(response);
                 callback && callback(response);
@@ -69,27 +72,24 @@ var REQUESTS = {
 
     },
 
-    logout: function(username) {
+    logout: function(sessionID) {
         data = {}
-        data["USERNAME"] = username;
-        send_request_to_server("logout", data, function() {
+        data["sessionID"] = sessionID;
+        send_request_to_server("playerLogout", data, function(response) {
             console.log("logged out");
         });
     },
 
-    answer: function(answer, callback) {
-        setTimeout(function() {
-            if (answer == "answer") {
-                callback(true);
-            } else {
-                callback(false);
-            }
-        }, 500);
+    answer: function(sessionID, answer, callback) {
+        data = {}
+        data["sessionID"] = sessionID;
+        data["ANSWER"] = answer;
+        send_request_to_server("checkAnswer", data, callback);
     },
 
-    next_question: function(uuid, callback) {
+    next_question: function(sessionID, callback) {
         data = {}
-        data["sessionID"] = uuid;
+        data["sessionID"] = sessionID;
         send_request_to_server("getQuestion", data, callback);
     }
 
@@ -106,7 +106,7 @@ var STATE = {
     questionNumber: 1,
     top_card: null,
     showing_hints: true,
-    uuud: null,
+    sessionID: null,
 
 
     switch_card_anim: function(new_top) {
@@ -283,9 +283,12 @@ function create_question_card(content) {
 
     submit_form.onsubmit = submit_button.onclick = function() {
         STATE.try_answer(submit_button, question_progress);
-        REQUESTS.answer(answer_input.value, function(correct) {
+        //send answer request
+        REQUESTS.answer(STATE.sessionID, answer_input.value, function(response) {
+            var correct = response["data"] === true;
+
             if (correct) {
-                REQUESTS.next_question(STATE.uuid, function(question) {
+                REQUESTS.next_question(STATE.sessionID, function(question) {
                     var question_card = create_question_card(question);
                     STATE.switch_card_anim(question_card);
                 });
@@ -367,17 +370,18 @@ function create_login_card(cssScene) {
         REQUESTS.login(email_input.value, password_input.value, function(response) {
 
             if (response["data"] === "PARAMS-INVALID" ||
-                response["data"] === "LOGIN-INVALID") {
+                response["data"] === "LOGIN-INVALID" ||
+                response["responseType"] === "apiError") {
                 STATE.error_login("wrong username or password");
 
             } else {
                 console.log("response from login: ", response);
-                STATE.uuid = response["uuid"];
-                console.log("UUID: ", STATE.uuid);
+                STATE.sessionID = response["data"]["sessionID"];
+                console.log("sessionID: ", STATE.sessionID);
 
-                REQUESTS.next_question(STATE.uuid, function(response) {
+                REQUESTS.next_question(STATE.sessionID, function(response) {
                     console.log("next question: ", response);
-                    question = "foobarrquxx";
+                    question = response["data"]["questionText"];
                     var question_card = create_question_card(question);
                     console.log(question_card);
                     STATE.switch_card_anim(question_card);
@@ -429,7 +433,7 @@ function create_profile_card() {
     card_elem.logout_button = logout_button;
 
     logout_button.onclick = function() {
-        REQUESTS.logout();
+        REQUESTS.logout(STATE.sessionID);
         STATE.logout();
         STATE.switch_card_anim(STATE.login_card_obj);
         STATE.hide_profile();
