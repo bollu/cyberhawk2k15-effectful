@@ -165,6 +165,13 @@ var STATE = {
         popup_toast(error_message);
     },
 
+    success_login: function() {
+        this.login_card_elem.login_button.disabled = false;
+        this.login_card_elem.login_progress.indeterminate = false;
+        this.login_card_elem.login_progress.value = 0;
+        popup_toast("successfully logged in");
+    },
+
     try_register: function() {
         this.register_card_elem.register_button.disabled = true;
         this.register_card_elem.register_progress.indeterminate = true;
@@ -427,10 +434,11 @@ function create_login_card(cssScene) {
                 console.log("sessionID: ", STATE.sessionID);
 
                 REQUESTS.get_question(STATE.sessionID, function(response) {
-                    console.log("next question: ", response);
-                    question = response["data"]["questionText"];
+                    STATE.success_login();
+                    //load the question
+                    var question = response["data"]["questionText"];
                     var question_card = create_question_card(question);
-                    console.log(question_card);
+                    //switch
                     STATE.switch_card_anim(question_card);
                     STATE.show_profile();
                     STATE.update_profile();
