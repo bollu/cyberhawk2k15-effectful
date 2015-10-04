@@ -107,6 +107,13 @@ var REQUESTS = {
         send_request_to_server("getMyPosition", data, callback);
     },
 
+    get_player_info: function(sessionID, callback) {
+        data = {
+            "sessionID": sessionID
+        };
+        send_request_to_server("getPlayer", data, callback);
+    }
+
 
 };
 
@@ -214,7 +221,11 @@ var STATE = {
             STATE.profile_card_elem.leadersTextRegion.innerHTML = response["data"]["leaders"];
             STATE.profile_card_elem.onParTextRegion.innerHTML = response["data"]["same"];
             STATE.profile_card_elem.trailersTextRegion.innerHTML = response["data"]["trailers"];
-        })
+        });
+
+        REQUESTS.get_player_info(STATE.sessionID, function(response) {
+            STATE.profile_card_elem.profileNameTextRegion.innerHTML = response["data"]["NAME"];
+        });
     },
     show_hints: function() {
         this.show_card(this.hints_card_obj, 300);
@@ -222,7 +233,7 @@ var STATE = {
 
     update_hints: function() {
         REQUESTS.get_hints(STATE.sessionID, function(response) {
-            STATE.hints_card_obj.hints_container.innerHTML = "";
+            STATE.hints_card_elem.hints_container.innerHTML = "";
             for (hint in response["data"]) {
                 STATE.hints_card_elem.hints_container.innerHTML += "<a class='hint'>" + hint + "</a>";
             };
@@ -285,7 +296,7 @@ function create_question_card(content) {
     var card_elem = document.createElement("paper-material");
     card_elem.setAttribute("class", "card");
     card_elem.setAttribute("elevation", "5");
-    //attach_ripple(card_elem);
+    attach_ripple(card_elem);
     var question_progress = create_progress();
     card_elem.appendChild(question_progress);
 
@@ -455,9 +466,10 @@ function create_profile_card() {
     card_elem.appendChild(profile_container);
 
 
-    var profileName = create_header("h3", "Dummy Name");
-    profileName.setAttribute("class", "profile-name");
-    profile_container.appendChild(profileName);
+    var profileNameTextRegion = create_header("h3", "Dummy Name");
+    profileNameTextRegion.setAttribute("class", "profile-name");
+    profile_container.appendChild(profileNameTextRegion);
+    card_elem.profileNameTextRegion = profileNameTextRegion;
 
     var positionsContainer = document.createElement("div");
     profile_container.appendChild(positionsContainer);
@@ -530,6 +542,7 @@ function create_hints_card() {
     var hints_container = document.createElement("div");
     hints_container.setAttribute("class", "hints-container");
     card_elem.appendChild(hints_container);
+    card_elem.hints_container = hints_container;
 
 
     var hints_header = create_header("h3", "Hints");
