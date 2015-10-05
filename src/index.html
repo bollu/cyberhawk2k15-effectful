@@ -24,9 +24,11 @@
 <link rel="import" href="bower_components/paper-progress/paper-progress.html">
 <link rel="import" href="bower_components/polymer/polymer.html">
 <script>
+"use strict";
+
 function popup_toast(string) {
     toast = document.querySelector("#toast");
-    Polymer.dom(toastElement).textContent = string;
+    Polymer.dom(GLOBALS.toastElement).textContent = string;
     toast.show();
 }
 
@@ -127,6 +129,7 @@ var GLOBALS = {
     cssRenderer: null,
     cssScene: null,
     mousePos: null,
+    toastElement: null,
 
 };
 var STATE = {
@@ -214,7 +217,7 @@ var STATE = {
         submit_button.disabled = false;
         answer_progress.indeterminate = false;
 
-        popup_toast("Wrong answer. Please try again");
+        popup_toast("The hawk disapproves");
     },
 
     hide_card: function(card_obj, delay) {
@@ -517,30 +520,30 @@ function create_profile_card() {
     profile_container.appendChild(positionsContainer);
 
     //leaders
-    var leadersHeader = create_header("h4", "Leaders");
+    var leadersHeader = create_header("h3", "Leaders");
     leadersHeader.setAttribute("class", "profile-header");
     positionsContainer.appendChild(leadersHeader)
 
-    var leadersTextRegion = create_header("h5", "qwer");
+    var leadersTextRegion = create_header("h4", "");
     positionsContainer.appendChild(leadersTextRegion);
     card_elem.leadersTextRegion = leadersTextRegion;
 
     //onpar
-    var onParHeader = create_header("h4", "On Par");
+    var onParHeader = create_header("h3", "On Par");
     onParHeader.setAttribute("class", "profile-header");
     positionsContainer.appendChild(onParHeader);
 
-    var onParTextRegion = create_header("h5", "qwer");
+    var onParTextRegion = create_header("h4", "");
     positionsContainer.appendChild(onParTextRegion);
     card_elem.onParTextRegion = onParTextRegion;
 
 
     //lagging
-    var trailersHeader = create_header("h4", "Trailers");
-    trailersHeader.setAttribute("class", "profile-header");
+    var trailersHeader = create_header("h3", "Trailers");
+    trailersHeader.setAttribute("class", "");
     positionsContainer.appendChild(trailersHeader);
 
-    var trailersTextRegion = create_header("h5", "qwer");
+    var trailersTextRegion = create_header("h4", "");
     positionsContainer.appendChild(trailersTextRegion);
     card_elem.trailersTextRegion = trailersTextRegion;
 
@@ -726,35 +729,36 @@ function create_register_card() {
         data["PHONE"] = phone_input.value;
 
         if (data["NAME"] === "") {
-            STATE.error_register("enter username");
+            STATE.error_register("the hawk expects a username");
             return;
         };
 
         if (data["PASSWORD"] === "") {
-            STATE.error_register("enter password");
+            STATE.error_register("the hawk expects a password");
             return;
         };
         var resubmit_password = password_resubmit_input.value;
         if (resubmit_password === "") {
-            STATE.error_register("enter retyped password");
+            STATE.error_register("the hawk wishes for the password twice");
             return;
 
         }
         var simple_email_regex = /\S+@\S+\.\S+/;
-        if (!simple_email_regex.test(data["EMAIL"])) {
-            STATE.error_register("enter valid E-mail id");
+        if (data["EMAIL"] === "" || !simple_email_regex.test(data["EMAIL"])) {
+            STATE.error_register("the hawk wishes for a true E-mail id");
+            return;
         };
 
         if (data["PASSWORD"] !== resubmit_password) {
-            STATE.error_register("passwords do not match");
+            STATE.error_register("the passwords do not pass the hawk's check");
             return;
         }
         if (data["PHONE"] === "") {
-            STATE.error_register("enter the phone number");
+            STATE.error_register("the hawk wishes to call you up sometime");
             return;
         }
         if (data["COLLEGE"] === "") {
-            STATE.error_register("enter college");
+            STATE.error_register("the hawk wishes to know where you study");
             return;
         };
 
@@ -813,12 +817,12 @@ function init() {
     document.body.appendChild(cssRenderer.domElement);
 
     //SETUP TOAST
-    toastElement = document.createElement("paper-toast");
-    toastElement.setAttribute("z-index", "9999");
-    toastElement.setAttribute("id", "toast");
-    toastElement.setAttribute("duration", "5000");
+    GLOBALS.toastElement = document.createElement("paper-toast");
+    GLOBALS.toastElement.setAttribute("z-index", "9999");
+    GLOBALS.toastElement.setAttribute("id", "toast");
+    GLOBALS.toastElement.setAttribute("duration", "5000");
 
-    document.body.appendChild(toastElement);
+    document.body.appendChild(GLOBALS.toastElement);
 
 
     create_register_card(cssScene);
@@ -853,7 +857,7 @@ function create_spring(initial_val) {
     }
 
     function step_fn(t) {
-        dt = (t - this.t) / 1000.0;
+        var dt = (t - this.t) / 1000.0;
         this.t = t;
 
         const step_time = 1.0 / 60.0;
@@ -1044,13 +1048,13 @@ paper-progress {
 .register-container,
 .login-container,
 .question-container {
-    padding-top: 20%;
-    padding-left: 20%;
-    padding-right: 20%;
+    padding-top: 2em;
+    padding-left: 2em;
+    padding-right: 2em;
 }
 
 .login-container paper-button {
-    margin-top: 10%;
+    margin-top: 2em;
 }
 
 paper-button {
@@ -1097,31 +1101,33 @@ paper-input-container label {
 
 .question-container h3 {}
 
-.question-container .content-container {
+.question-container {
     margin-top: 30%;
     margin-bottom: 30%;
+    width: 300px;
 }
 
 .question-container paper-input {
-    margin-bottom: 10%;
+    margin-bottom: 2em;
 }
 
 .question-container paper-button {
-    margin-top: 20%;
+    margin-top: 2em;
 }
 
 
 /*profile*/
 
 .profile-container {
-    padding-top: 10%;
-    padding-bottom: 30%;
-    padding-left: 10%;
-    padding-right: 10%;
+    width: 250px;
+    padding-top: 3em;
+    padding-bottom: 3em;
+    padding-left: 3em;
+    padding-right: 3em;
 }
 
 .profile-container paper-button {
-    margin-top: 20%;
+    margin-top: 2em;
 }
 
 .profile-header {
@@ -1136,10 +1142,11 @@ paper-input-container label {
 
 .hints-container,
 .rules-container {
-    padding-top: 10%;
-    padding-bottom: 30%;
-    padding-left: 10%;
-    padding-right: 10%;
+    padding-top: 3em;
+    padding-bottom: 3em;
+    padding-left: 3em;
+    padding-right: 3em;
+    width: 250px;
 }
 
 .hint-region {
