@@ -70,12 +70,9 @@ function send_request_to_server(request_name, data, callback) {
 
                 callback && callback(response);
             })
-            .fail(function(respose) {
-                response = JSON.parse(response);
-                response.success = false;
-
-                console.log("response for (" + request_name + "): ", response);
-                callback && callback(response);
+            .fail(function() {
+                console.log("response for (" + request_name + "): ");
+                popup_toast("the hawk is unable to contact the nest");
             });
     };
     setTimeout(requestFn, 1000);
@@ -364,7 +361,7 @@ function create_progress() {
     return spinner;
 }
 
-function create_question_card(question_text, question_image_url) {
+function create_question_card(response) {
     var card_paper = document.createElement("paper-material");
     var card_elem = document.createElement("div");
     card_elem.setAttribute("class", "card");
@@ -372,7 +369,7 @@ function create_question_card(question_text, question_image_url) {
 
     card_elem.setAttribute("class", "card");
     card_elem.setAttribute("elevation", "5");
-    attach_ripple(card_elem);
+    //attach_ripple(card_elem);
     var question_progress = create_progress();
     card_elem.appendChild(question_progress);
 
@@ -389,20 +386,36 @@ function create_question_card(question_text, question_image_url) {
     })
 
 
-
     var content_region = document.createElement("div");
     content_region.setAttribute("class", "content-container");
+    var question_text = response["data"]["questionText"];
+
     if (question_text != undefined) {
         content_region.innerHTML = question_text;
     };
-
     question_container.appendChild(content_region);
 
-    var image_region = document.createElement("img");
-    if (question_image_url != undefined) {
-        image_region.setAttribute("src", question_image_url);
+
+    var question_image_url = response["data"]["questionIMG"];
+
+    var image_data_region = document.createElement("div");
+    question_container.appendChild(image_data_region);
+
+    if (question_image_url != "NA") {
+        var image_url = document.createElement("a");
+        image_url.setAttribute("href", "cyberhawk.iecsemanipal.com/api/uploads/" + question_image_url);
+        image_url.innerHTML = "cyberhawk.iecsemanipal.com/api/uploads/" + question_image_url;
+        image_data_region.appendChild(image_url);
+
     };
-    question_container.appendChild(image_region);
+
+
+    var question_title = response["data"]["questionTitle"];
+    if (question_title != "False") {
+        document.title = question_title;
+    }
+
+
 
 
     var submit_form = document.createElement("form");
@@ -438,8 +451,9 @@ function create_question_card(question_text, question_image_url) {
 
             if (correct) {
                 REQUESTS.get_question(STATE.sessionID, function(response) {
-                    var question = response["data"]["questionText"];
-                    var question_card = create_question_card(question);
+                    //var question = response["data"]["questionText"];
+                    STATE.questionNumber += 1; //UPDATE Q NUMBER
+                    var question_card = create_question_card(response);
                     STATE.switch_card_anim(question_card);
                     STATE.update_hints();
                 });
@@ -539,7 +553,7 @@ function create_login_card(cssScene) {
                     STATE.success_login();
                     //load the question
                     var question = response["data"]["questionText"];
-                    var question_card = create_question_card(question);
+                    var question_card = create_question_card(response);
                     //switch
                     STATE.switch_card_anim(question_card);
                     STATE.show_profile();
@@ -640,7 +654,7 @@ function create_profile_card() {
     card_obj.position.x = +1000;
     card_obj.position.z = 5;
 
-    card_obj.rotation.y = deg2rad(30);
+    card_obj.rotation.y = deg2rad(-30);
 
     GLOBALS.cssScene.add(card_obj);
 
@@ -902,7 +916,7 @@ function init() {
 
     //cssRenderer.domElement.style.background = '#161928';
     //cssRenderer.domElement.style.background = '#EFEFEF';
-    cssRenderer.domElement.style.background = '#243B4F';
+    cssRenderer.domElement.style.background = '#111111';
 
 
     /*
@@ -1078,7 +1092,7 @@ var render = function(time) {
         GLOBALS.camera.rotation.y = -ROTATE_FACTOR * (GLOBALS.mousePos.x.get() - window.innerWidth * 0.5) / window.innerWidth;
         GLOBALS.camera.rotation.x = -ROTATE_FACTOR * (GLOBALS.mousePos.y.get() - window.innerHeight * 0.5) / window.innerHeight;
     };
-    //cssObject.rotation.x += 0.01;
+    //cssObject.rotation.x += 0.01
     GLOBALS.cssRenderer.render(GLOBALS.cssScene, GLOBALS.camera);
     GLOBALS.mousePos.x.step(time);
     GLOBALS.mousePos.y.step(time);
