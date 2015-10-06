@@ -1,7 +1,7 @@
 <html>
 
 <head>
-    <title> Cyberhawk 2015</title>
+    <title> CyberHawk 2015</title>
     <meta name="viewport" content="width=device-width" />
 </head>
 <!-- body -->
@@ -48,7 +48,7 @@ function popup_toast(string) {
 }
 
 function send_request_to_server(request_name, data, callback) {
-    var REQUEST_URL = "http://iecsemanipal.com/cyberhawk/api";
+    var REQUEST_URL = "http://cyberhawk.iecsemanipal.com/api";
     var API_KEY = "fUJxtW62tresIB7m";
     data["API_KEY"] = API_KEY;
     data["REQUEST"] = request_name;
@@ -59,21 +59,17 @@ function send_request_to_server(request_name, data, callback) {
 
     var requestFn = function() {
         $.ajax({
-                type: "GET",
-                url: REQUEST_URL,
-                data: data,
-                timeout: 8000 // sets timeout
-            }).done(function(response) {
-                response = JSON.parse(response);
-                response.success = true;
-                console.log("response for (" + request_name + "): ", response);
+            type: "GET",
+            url: REQUEST_URL,
+            data: data,
+            timeout: 8000 // sets timeout
+        }).done(function(response) {
+            response = JSON.parse(response);
+            response.success = true;
+            console.log("response for (" + request_name + "): ", response);
 
-                callback && callback(response);
-            })
-            .fail(function() {
-                console.log("response for (" + request_name + "): ");
-                popup_toast("the hawk is unable to contact the nest");
-            });
+            callback && callback(response);
+        });
     };
     setTimeout(requestFn, 1000);
 }
@@ -378,11 +374,17 @@ function create_question_card(response) {
     question_container.setAttribute("class", "question-container");
     card_elem.appendChild(question_container);
 
-    var question_title = create_header("h1", "Level " + STATE.questionNumber);
+    var question_title = document.createElement("h1");
+    question_title.innerHTML = "Level " + STATE.questionNumber;
     question_container.appendChild(question_title);
 
     REQUESTS.get_player_info(STATE.sessionID, function(response) {
         question_title.innerHTML = "Level " + response["data"]["LEVEL"];
+
+        var question_title = response["data"]["questionTitle"];
+        if (question_title != "False") {
+            document.title = question_title;
+        };
     })
 
 
@@ -409,11 +411,6 @@ function create_question_card(response) {
 
     };
 
-
-    var question_title = response["data"]["questionTitle"];
-    if (question_title != "False") {
-        document.title = question_title;
-    }
 
 
 
@@ -452,7 +449,7 @@ function create_question_card(response) {
             if (correct) {
                 REQUESTS.get_question(STATE.sessionID, function(response) {
                     //var question = response["data"]["questionText"];
-                    STATE.questionNumber += 1; //UPDATE Q NUMBER
+                    STATE.questionNumber = parseInt(STATE.questionNumber) + 1; //UPDATE Q NUMBER
                     var question_card = create_question_card(response);
                     STATE.switch_card_anim(question_card);
                     STATE.update_hints();
@@ -652,9 +649,9 @@ function create_profile_card() {
     var card_obj = create_css3d_obj(card_elem);
     card_obj.position.y = -1000;
     card_obj.position.x = +1000;
-    card_obj.position.z = 5;
+    card_obj.position.z = -20;
 
-    card_obj.rotation.y = deg2rad(-30);
+    card_obj.rotation.y = deg2rad(-5);
 
     GLOBALS.cssScene.add(card_obj);
 
@@ -708,7 +705,10 @@ function create_hints_card() {
     var card_obj = create_css3d_obj(card_elem);
     card_obj.position.y = -1000;
     card_obj.position.x = -300;
-    card_obj.position.z = 5;
+    card_obj.position.z = -20;
+
+    card_obj.rotation.y = deg2rad(5);
+
 
     GLOBALS.cssScene.add(card_obj);
 
@@ -736,8 +736,10 @@ function create_rules_card() {
     rules_container.appendChild(rules_header);
 
     var card_obj = create_css3d_obj(card_elem);
-    card_obj.position.z = -5;
+    card_obj.position.z = -20;
     card_obj.position.y = -1000;
+    card_obj.rotation.y = deg2rad(5);
+
 
     GLOBALS.cssScene.add(card_obj);
 
@@ -902,7 +904,7 @@ function init() {
 
 
     var camera = null;
-    var FOV_amount = is_mobile() ? 60 : 75;
+    var FOV_amount = 75;
     camera = new THREE.PerspectiveCamera(FOV_amount, window.innerWidth / window.innerHeight, 0.1, 1000);
     GLOBALS.camera = camera;
 
@@ -963,7 +965,7 @@ function init() {
 
     function setup_request_handler_catch_all() {
         $(document).ajaxError(function(event, jqxhr, settings, thrownError) {
-            popup_toast("the hawk was unable its nest");
+            popup_toast("the hawk was unable to reach its nest");
         });
     };
     setup_request_handler_catch_all();
@@ -1109,9 +1111,9 @@ window.onresize = function() {
     GLOBALS.cssRenderer.setSize(window.innerWidth, window.innerHeight);
 
 
-    STATE.profile_card_obj.position.x = window.innerWidth * 0.5;
-    STATE.hints_card_obj.position.x = -window.innerWidth * 0.5;
-    STATE.rules_card_obj.position.x = -window.innerWidth * 0.5;
+    STATE.profile_card_obj.position.x = window.innerWidth * 0.4;
+    STATE.hints_card_obj.position.x = -window.innerWidth * 0.4;
+    STATE.rules_card_obj.position.x = -window.innerWidth * 0.4;
 
     console.log("resized!");
 };
