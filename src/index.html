@@ -274,12 +274,15 @@ var STATE = {
     update_profile: function() {
         //HUGE HUGE HACK vvvvvvvvvvv
         return;
+        return;
+        return;
 
         REQUESTS.get_position(STATE.sessionID, function(response) {
             STATE.profile_card_elem.leadersTextRegion.innerHTML = response["data"]["leaders"];
             STATE.profile_card_elem.onParTextRegion.innerHTML = response["data"]["same"];
             STATE.profile_card_elem.trailersTextRegion.innerHTML = response["data"]["trailers"];
         });
+        return;
 
         REQUESTS.get_player_info(STATE.sessionID, function(response) {
             STATE.profile_card_elem.profileNameTextRegion.innerHTML = response["data"]["NAME"];
@@ -740,7 +743,7 @@ function create_teaser_card() {
     card_paper.appendChild(card_elem);
 
     var hello_header = document.createElement("h1");
-    hello_header.innerHTML = "Welcome to Cyberhawk";
+    hello_header.innerHTML = "Welcome to CyberHawk";
     card_elem.appendChild(hello_header);
 
     var wait_for_it_header = document.createElement("h3");
