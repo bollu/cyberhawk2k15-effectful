@@ -2,7 +2,6 @@
 
 <head>
     <title> Cyberhawk 2015</title>
-    <meta content='width=device-width; initial-scale=1.0; maximum-scale=1.0; user-scalable=0;' name='viewport' />
     <meta name="viewport" content="width=device-width" />
 </head>
 <!-- body -->
@@ -26,8 +25,12 @@
 <script>
 "use strict";
 
+function is_mobile() {
+    return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+}
+
 function popup_toast(string) {
-    toast = document.querySelector("#toast");
+    var toast = document.querySelector("#toast");
     Polymer.dom(GLOBALS.toastElement).textContent = string;
     toast.show();
 }
@@ -47,6 +50,7 @@ function send_request_to_server(request_name, data, callback) {
                 type: "GET",
                 url: REQUEST_URL,
                 data: data,
+                timeout: 8000 // sets timeout
             }).done(function(response) {
                 response = JSON.parse(response);
                 response.success = true;
@@ -68,7 +72,7 @@ function send_request_to_server(request_name, data, callback) {
 var REQUESTS = {
     //calls callback with true for successful login, false for unsucessful login
     login: function(email, password, callback) {
-        data = {}
+        var data = {}
         data["EMAIL"] = email;
         data["PASSWORD"] = password;
         send_request_to_server("playerLogin", data, callback)
@@ -80,7 +84,7 @@ var REQUESTS = {
     },
 
     logout: function(sessionID) {
-        data = {}
+        var data = {}
         data["sessionID"] = sessionID;
         send_request_to_server("playerLogout", data, function(response) {
             console.log("logged out");
@@ -88,34 +92,34 @@ var REQUESTS = {
     },
 
     answer: function(sessionID, answer, callback) {
-        data = {}
+        var data = {}
         data["sessionID"] = sessionID;
         data["ANSWER"] = answer;
         send_request_to_server("checkAnswer", data, callback);
     },
 
     get_question: function(sessionID, callback) {
-        data = {}
+        var data = {}
         data["sessionID"] = sessionID;
         send_request_to_server("getQuestion", data, callback);
     },
 
     get_hints: function(sessionID, callback) {
-        data = {
+        var data = {
             "sessionID": sessionID
         };
         send_request_to_server("getHints", data, callback);
     },
 
     get_position: function(sessionID, callback) {
-        data = {
+        var data = {
             "sessionID": sessionID
         };
         send_request_to_server("getMyPosition", data, callback);
     },
 
     get_player_info: function(sessionID, callback) {
-        data = {
+        var data = {
             "sessionID": sessionID
         };
         send_request_to_server("getPlayer", data, callback);
@@ -184,7 +188,6 @@ var STATE = {
 
         //enable logout buttons
         this.profile_card_elem.logout_button.disabled = false;
-        popup_toast("successfully logged in");
     },
 
     try_register: function() {
@@ -201,16 +204,17 @@ var STATE = {
         popup_toast(error_message)
     },
     success_register: function() {
-        popup_toast("registered successfully");
+        popup_toast("The hawk accepts you. Now play");
         this.register_card_elem.register_button.disabled = false;
         this.register_card_elem.go_to_login_button.disabled = false;
         this.register_card_elem.register_progress.indeterminate = false;
 
     },
 
-    try_answer: function(submit_button, answer_progress) {
+    try_answer: function(submit_button, answer_progress, answer) {
         submit_button.disabled = true;
         answer_progress.indeterminate = true;
+        popup_toast("trying: " + answer);
     },
 
     error_answer: function(submit_button, answer_progress) {
@@ -220,11 +224,26 @@ var STATE = {
         popup_toast("The hawk disapproves");
     },
 
+    error_answer_too_many_req: function(submit_button, answer_progress) {
+        submit_button.disabled = false;
+        answer_progress.indeterminate = false;
+
+        popup_toast("Stop spamming the hawk");
+
+    },
+
     hide_card: function(card_obj, delay) {
         delay = delay == undefined ? 0 : delay;
+
+        var hide_with_scale = function() {
+            card_obj.scale.x = 0;
+        };
+
         var hide_tween = new TWEEN.Tween(card_obj.position).to({
             y: -1000
-        }).easing(TWEEN.Easing.Cubic.In);
+        }).easing(TWEEN.Easing.Cubic.In).onComplete(hide_with_scale);
+
+
         hide_tween.delay(delay).start();
 
     },
@@ -233,6 +252,9 @@ var STATE = {
         var show_tween = new TWEEN.Tween(card_obj.position).to({
             y: 0
         }).easing(TWEEN.Easing.Cubic.Out);;
+
+
+        card_obj.scale.x = 1;
         show_tween.delay(delay).start();
     },
 
@@ -262,6 +284,12 @@ var STATE = {
 
     update_hints: function() {
         REQUESTS.get_hints(STATE.sessionID, function(response) {
+            if (response["data"].length === 0) {
+                STATE.hints_card_elem.no_hints.style.display = "none";
+            } else {
+                STATE.hints_card_elem.no_hints.style.display = "inline";
+            }
+
             for (var i = 0; i < response["data"].length; i++) {
                 var hint = response["data"][i];
                 console.log("~~hints: ", hint);
@@ -281,6 +309,7 @@ var STATE = {
         //logout_button.disabled = true;
         this.profile_card_elem.logout_button.disabled = true;
         this.login_card_elem.login_button.disabled = false;
+        STATE.sessionID = null;
     }
 
 }
@@ -299,6 +328,7 @@ function attach_ripple(elem) {
 function create_input(label) {
     var input = document.createElement("paper-input");
     input.setAttribute("label", label);
+    input.setAttribute("autocomplete", "on");
     return input;
 }
 
@@ -322,7 +352,7 @@ function create_progress() {
     return spinner;
 }
 
-function create_question_card(content) {
+function create_question_card(question_text, question_image_url) {
     var card_paper = document.createElement("paper-material");
     var card_elem = document.createElement("div");
     card_elem.setAttribute("class", "card");
@@ -339,7 +369,7 @@ function create_question_card(content) {
     question_container.setAttribute("class", "question-container");
     card_elem.appendChild(question_container);
 
-    var question_title = create_header("h3", "Level " + STATE.questionNumber);
+    var question_title = create_header("h1", "Level " + STATE.questionNumber);
     question_container.appendChild(question_title);
 
     REQUESTS.get_player_info(STATE.sessionID, function(response) {
@@ -347,10 +377,21 @@ function create_question_card(content) {
     })
 
 
+
     var content_region = document.createElement("div");
     content_region.setAttribute("class", "content-container");
-    content_region.innerHTML = content;
+    if (question_text != undefined) {
+        content_region.innerHTML = question_text;
+    };
+
     question_container.appendChild(content_region);
+
+    var image_region = document.createElement("img");
+    if (question_image_url != undefined) {
+        image_region.setAttribute("src", question_image_url);
+    };
+    question_container.appendChild(image_region);
+
 
     var submit_form = document.createElement("form");
     submit_form.action = "#";
@@ -365,10 +406,22 @@ function create_question_card(content) {
 
     submit_form.onsubmit = submit_button.onclick = function(e) {
         e.preventDefault();
+        var answer = answer_input.value.replace(/ /g, '').toUpperCase();
+        answer_input.value = answer;
 
-        STATE.try_answer(submit_button, question_progress);
+        if (answer === "") {
+            console.log("the hawk dislikes empty answers");
+        }
+
+        STATE.try_answer(submit_button, question_progress, answer);
         //send answer request
-        REQUESTS.answer(STATE.sessionID, answer_input.value, function(response) {
+        REQUESTS.answer(STATE.sessionID, answer, function(response) {
+
+            if (response["data"] == "TOO-MANY-REQUESTS") {
+                STATE.error_answer_too_many_req(submit_button, question_progress);
+                return;
+            };
+
             var correct = response["data"] === true;
 
             if (correct) {
@@ -414,6 +467,7 @@ function create_login_card(cssScene) {
 
     var login_form = document.createElement("form");
     login_form.action = "#";
+    login_form.autocomplete = "on";
     login_form.setAttribute("class", "login-container");
     card_elem.appendChild(login_form)
 
@@ -451,18 +505,18 @@ function create_login_card(cssScene) {
         STATE.try_login();
 
         if (email_input.value === "") {
-            STATE.error_login("enter E-mail id");
+            STATE.error_login("the hawk wants an e-mail ID");
             return;
         };
         if (password_input.value === "") {
-            STATE.error_login("enter password");
+            STATE.error_login("the hawk wants a password");
         };
         REQUESTS.login(email_input.value, password_input.value, function(response) {
 
             if (response["data"] === "PARAMS-INVALID" ||
                 response["data"] === "LOGIN-INVALID" ||
                 response["responseType"] === "apiError") {
-                STATE.error_login("wrong username or password");
+                STATE.error_login("don't lie to the hawk");
 
             } else {
                 console.log("response from login: ", response);
@@ -511,7 +565,7 @@ function create_profile_card() {
     card_elem.appendChild(profile_container);
 
 
-    var profileNameTextRegion = create_header("h3", "Dummy Name");
+    var profileNameTextRegion = create_header("h3", "Loading...");
     profileNameTextRegion.setAttribute("class", "profile-name");
     profile_container.appendChild(profileNameTextRegion);
     card_elem.profileNameTextRegion = profileNameTextRegion;
@@ -524,7 +578,9 @@ function create_profile_card() {
     leadersHeader.setAttribute("class", "profile-header");
     positionsContainer.appendChild(leadersHeader)
 
-    var leadersTextRegion = create_header("h4", "");
+    var leadersTextRegion = create_header("h3", "0");
+    leadersTextRegion.setAttribute("class", "profile-leaderboard-val");
+
     positionsContainer.appendChild(leadersTextRegion);
     card_elem.leadersTextRegion = leadersTextRegion;
 
@@ -533,17 +589,21 @@ function create_profile_card() {
     onParHeader.setAttribute("class", "profile-header");
     positionsContainer.appendChild(onParHeader);
 
-    var onParTextRegion = create_header("h4", "");
+    var onParTextRegion = create_header("h4", "0");
+    onParTextRegion.setAttribute("class", "profile-leaderboard-val");
+
     positionsContainer.appendChild(onParTextRegion);
     card_elem.onParTextRegion = onParTextRegion;
 
 
     //lagging
     var trailersHeader = create_header("h3", "Trailers");
-    trailersHeader.setAttribute("class", "");
+    trailersHeader.setAttribute("class", "profile-header");
     positionsContainer.appendChild(trailersHeader);
 
-    var trailersTextRegion = create_header("h4", "");
+    var trailersTextRegion = create_header("h4", "0");
+    trailersTextRegion.setAttribute("class", "profile-leaderboard-val");
+
     positionsContainer.appendChild(trailersTextRegion);
     card_elem.trailersTextRegion = trailersTextRegion;
 
@@ -564,12 +624,15 @@ function create_profile_card() {
     }
 
     var card_obj = create_css3d_obj(card_elem);
+    card_obj.position.y = -1000;
+    card_obj.position.x = +1000;
+    card_obj.position.z = 5;
     GLOBALS.cssScene.add(card_obj);
 
     STATE.profile_card_obj = card_obj;
     STATE.profile_card_elem = card_elem;
 
-    card_obj.position.y = -1000;
+
 
     return card_obj;
 }
@@ -594,8 +657,13 @@ function create_hints_card() {
     card_elem.appendChild(hints_container);
     card_elem.hints_container = hints_container;
 
-    var hints_header = create_header("h3", "Hints");
+    var hints_header = create_header("h2", "Hints");
     hints_container.appendChild(hints_header);
+
+    var no_hints = create_header("h4", "The hawk has no hints yet");
+    hints_container.appendChild(no_hints);
+    no_hints.style.display = "none";
+    card_elem.no_hints = no_hints;
 
     card_elem.hintTextRegion = [];
 
@@ -610,6 +678,8 @@ function create_hints_card() {
 
     var card_obj = create_css3d_obj(card_elem);
     card_obj.position.y = -1000;
+    card_obj.position.x = -300;
+    card_obj.position.z = -5;
 
     GLOBALS.cssScene.add(card_obj);
 
@@ -633,11 +703,11 @@ function create_rules_card() {
     rules_container.setAttribute("class", "rules-container");
     card_elem.appendChild(rules_container);
 
-    var rules_header = create_header("h3", "Rules");
+    var rules_header = create_header("h1", "Rules");
     rules_container.appendChild(rules_header);
 
     var card_obj = create_css3d_obj(card_elem);
-    card_obj.position.z = -2;
+    card_obj.position.z = -5;
     card_obj.position.y = -1000;
 
     GLOBALS.cssScene.add(card_obj);
@@ -721,7 +791,7 @@ function create_register_card() {
 
         STATE.try_register();
 
-        data = {};
+        var data = {};
         data["NAME"] = name_input.value;
         data["EMAIL"] = email_input.value;
         data["PASSWORD"] = password_input.value;
@@ -757,6 +827,9 @@ function create_register_card() {
             STATE.error_register("the hawk wishes to call you up sometime");
             return;
         }
+        if (data["PHONE"].length != 10) {
+            STATE.error_register("the hawk wishes for a 10 digit number");
+        }
         if (data["COLLEGE"] === "") {
             STATE.error_register("the hawk wishes to know where you study");
             return;
@@ -766,12 +839,12 @@ function create_register_card() {
 
         REQUESTS.register(data, function(response) {
             if (response["data"] === "PARAMS-INVALID") {
-                STATE.error_register("invalid register info");
+                STATE.error_register("the hawk is unable to register you");
 
 
             } else if (response["data"] === "USER-EXISTS") {
-                STATE.error_register("user already exists");
-            } else if (response["data"] === "") {
+                STATE.error_register("the hawk notices that you've already registered");
+            } else if (response["data"] === null) {
                 console.log("registered");
                 STATE.success_register();
                 STATE.switch_card_anim(STATE.login_card_obj);
@@ -800,7 +873,8 @@ function init() {
 
 
     var camera = null;
-    camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+    var FOV_amount = is_mobile() ? 60 : 75;
+    camera = new THREE.PerspectiveCamera(FOV_amount, window.innerWidth / window.innerHeight, 0.1, 1000);
 
     GLOBALS.camera = camera;
 
@@ -812,7 +886,8 @@ function init() {
     cssRenderer.domElement.style.position = 'absolute';
     cssRenderer.domElement.style.top = 0;
     //cssRenderer.domElement.style.background = '#161928';
-    cssRenderer.domElement.style.background = '#EFEFEF';
+    //cssRenderer.domElement.style.background = '#EFEFEF';
+    cssRenderer.domElement.style.background = '#243B4F';
 
     document.body.appendChild(cssRenderer.domElement);
 
@@ -820,7 +895,7 @@ function init() {
     GLOBALS.toastElement = document.createElement("paper-toast");
     GLOBALS.toastElement.setAttribute("z-index", "9999");
     GLOBALS.toastElement.setAttribute("id", "toast");
-    GLOBALS.toastElement.setAttribute("duration", "5000");
+    GLOBALS.toastElement.setAttribute("duration", "7000");
 
     document.body.appendChild(GLOBALS.toastElement);
 
@@ -839,6 +914,32 @@ function init() {
         slide_up_tween.start();
     };
     make_register_slide_up();
+
+    function setup_request_handler_catch_all() {
+        $(document).ajaxError(function(event, jqxhr, settings, thrownError) {
+            popup_toast("the hawk was unable its nest");
+        });
+    };
+    setup_request_handler_catch_all();
+
+
+    function setup_hints_reload() {
+        setTimeout(function() {
+            if (STATE.sessionID != null) {
+                STATE.update_hints();
+            }
+        }, 60 * 1000);
+    };
+    setup_hints_reload();
+
+    function setup_profile_reload() {
+        setTimeout(function() {
+            if (STATE.sessionID != null) {
+                STATE.update_profile();
+            }
+        }, 60 * 1000);
+    };
+    setup_profile_reload();
 };
 
 
@@ -936,11 +1037,12 @@ function create_gyro_position_tracker() {
 };
 var render = function(time) {
     requestAnimationFrame(render);
-    const ROTATE_FACTOR = 0.25;
+    const ROTATE_FACTOR = 0.1;
 
-    GLOBALS.camera.rotation.y = -ROTATE_FACTOR * (GLOBALS.mousePos.x.get() - window.innerWidth * 0.5) / window.innerWidth;
-    GLOBALS.camera.rotation.x = -ROTATE_FACTOR * (GLOBALS.mousePos.y.get() - window.innerHeight * 0.5) / window.innerHeight;
-
+    if (!is_mobile()) {
+        GLOBALS.camera.rotation.y = -ROTATE_FACTOR * (GLOBALS.mousePos.x.get() - window.innerWidth * 0.5) / window.innerWidth;
+        GLOBALS.camera.rotation.x = -ROTATE_FACTOR * (GLOBALS.mousePos.y.get() - window.innerHeight * 0.5) / window.innerHeight;
+    };
     //cssObject.rotation.x += 0.01;
     GLOBALS.cssRenderer.render(GLOBALS.cssScene, GLOBALS.camera);
     GLOBALS.mousePos.x.step(time);
@@ -962,7 +1064,7 @@ window.onresize = function() {
 
 init();
 create_mouse_position_tracker();
-create_gyro_position_tracker();
+//create_gyro_position_tracker();
 window.onresize();
 render();
 </script>
@@ -996,6 +1098,14 @@ body {
     height: 100%;
 }
 
+paper-toast {
+    font-family: "Segoe UI" !important;
+    font-weight: 300;
+    font-size: 1.3em;
+    padding-left: 2em;
+    padding-right: 2em;
+}
+
 h1,
 h2,
 h3,
@@ -1021,9 +1131,10 @@ canvas {
     padding-right: 2em;
     /*
     background-color: #24263D;
-    */
     background-color: #3E7797;
-    color: #dfdfdf;
+    */
+    background-color: #F9FAFF;
+    color: #000000;
 }
 
 paper-progress {
@@ -1039,7 +1150,7 @@ paper-progress {
     /*
     background-color: #6A7DD3 !important;
     */
-    background-color: #F76138 !important;
+    background-color: #E34D2C !important;
 }
 
 
@@ -1054,15 +1165,16 @@ paper-progress {
 }
 
 .login-container paper-button {
-    margin-top: 2em;
+    margin-top: 1em;
 }
 
 paper-button {
     /*
     background: #5ECBEE;
-    */
     background: #EFAC49;
-    color: #ffffff;
+    */
+    background: #343A4F;
+    color: #efefef;
     width: 100%;
     padding-left: 10%;
     padding-right: 10%;
@@ -1074,18 +1186,26 @@ label {
     /*
     color: #bfbfbf !important;
     */
-    color: #dedede !important;
+    color: #7AB2D9 !important;
 }
 
 .focused-line {
-    background: #EFAC49 !important;
+    background: #E34D2C !important;
 }
 
 paper-input-container input,
 paper-input-container label {
     font-family: "Meslo LG S DZ for Powerline" !important;
-    color: #dfdfdf;
-    --paper-input-container-focus-color: #dfdfdf;
+    color: #0000FF;
+    --paper-input-container-focus-color: #0000FF;
+}
+
+
+/*toast */
+
+paper-toast {
+    background-color: #EFEFEF;
+    color: #000000;
 }
 
 
@@ -1102,9 +1222,12 @@ paper-input-container label {
 .question-container h3 {}
 
 .question-container {
-    margin-top: 30%;
-    margin-bottom: 30%;
+    margin-top: 3em;
+    margin-bottom: 3em;
     width: 300px;
+    min-width: 300px;
+    max-width: 300px;
+    font-size: 0.8em;
 }
 
 .question-container paper-input {
@@ -1119,7 +1242,6 @@ paper-input-container label {
 /*profile*/
 
 .profile-container {
-    width: 250px;
     padding-top: 3em;
     padding-bottom: 3em;
     padding-left: 3em;
@@ -1132,7 +1254,18 @@ paper-input-container label {
 
 .profile-header {
     font-weight: 400;
-    border-bottom: 1px solid #EFEFEF;
+    padding-right: 1em;
+    margin-bottom: 0.8em;
+    padding-bottom: 0px;
+    border-bottom: 1px solid #CDDDEA;
+}
+
+.profile-leaderboard-val {
+    font-family: "Meslo LG S DZ" !important;
+    color: #555555;
+    font-weight: 300;
+    margin-top: 0px;
+    padding-top: 0px;
 }
 
 
