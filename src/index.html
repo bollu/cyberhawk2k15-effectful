@@ -25,6 +25,10 @@
 <script>
 "use strict";
 
+function deg2rad(degree) {
+    return degree * Math.PI / 180.0;
+}
+
 function is_mobile() {
     return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
 }
@@ -627,6 +631,9 @@ function create_profile_card() {
     card_obj.position.y = -1000;
     card_obj.position.x = +1000;
     card_obj.position.z = 5;
+
+    card_obj.rotation.x = deg2rad(30);
+
     GLOBALS.cssScene.add(card_obj);
 
     STATE.profile_card_obj = card_obj;
@@ -679,7 +686,7 @@ function create_hints_card() {
     var card_obj = create_css3d_obj(card_elem);
     card_obj.position.y = -1000;
     card_obj.position.x = -300;
-    card_obj.position.z = -5;
+    card_obj.position.z = 5;
 
     GLOBALS.cssScene.add(card_obj);
 
@@ -1052,13 +1059,14 @@ var render = function(time) {
 
 //onresize handler
 window.onresize = function() {
-
     GLOBALS.camera.aspectRatio = window.innerWidth / window.innerHeight;
     GLOBALS.cssRenderer.setSize(window.innerWidth, window.innerHeight);
 
-    STATE.profile_card_obj.position.x = window.innerWidth * 0.35;
-    STATE.hints_card_obj.position.x = -window.innerWidth * 0.35;
-    STATE.rules_card_obj.position.x = -window.innerWidth * 0.35;
+
+    STATE.profile_card_obj.position.x = window.innerWidth * 0.5;
+    STATE.hints_card_obj.position.x = -window.innerWidth * 0.5;
+    STATE.rules_card_obj.position.x = -window.innerWidth * 0.5;
+
     console.log("resized!");
 };
 
@@ -1224,8 +1232,6 @@ paper-toast {
 .question-container {
     margin-top: 3em;
     margin-bottom: 3em;
-    width: 300px;
-    min-width: 300px;
     max-width: 300px;
     font-size: 0.8em;
 }
