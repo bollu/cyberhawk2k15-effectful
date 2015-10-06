@@ -386,6 +386,8 @@ function create_question_card(response) {
 
     var content_region = document.createElement("div");
     content_region.setAttribute("class", "content-container");
+
+
     var question_text = response["data"]["questionText"];
 
     if (question_text != undefined) {
@@ -1151,9 +1153,9 @@ setTimeout(function() {
         GLOBALS.cssRenderer.setSize(window.innerWidth, window.innerHeight);
 
 
-        STATE.profile_card_obj.position.x = 400;
-        STATE.hints_card_obj.position.x = -400;
-        STATE.rules_card_obj.position.x = -400;
+        STATE.profile_card_obj.position.x = 450;
+        STATE.hints_card_obj.position.x = -450;
+        STATE.rules_card_obj.position.x = -450;
 
         console.log("resized!");
     };
@@ -1332,6 +1334,10 @@ paper-toast {
 
 .question-container paper-button {
     margin-top: 2em;
+}
+
+.content-container {
+    font-size: 1.8em;
 }
 
 
