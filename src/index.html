@@ -33,6 +33,9 @@ HTMLImports.whenReady(function() {
 });
 */
 
+console.log = function() {};
+
+
 function deg2rad(degree) {
     return degree * Math.PI / 180.0;
 }
@@ -290,9 +293,10 @@ var STATE = {
     update_hints: function() {
         REQUESTS.get_hints(STATE.sessionID, function(response) {
             if (response["data"].length === 0) {
-                STATE.hints_card_elem.no_hints.style.display = "none";
-            } else {
                 STATE.hints_card_elem.no_hints.style.display = "inline";
+            } else {
+                STATE.hints_card_elem.no_hints.style.display = "none";
+
             }
 
             for (var i = 0; i < response["data"].length; i++) {
@@ -376,16 +380,8 @@ function create_question_card(response) {
 
     var question_title = document.createElement("h1");
     question_title.innerHTML = "Level " + STATE.questionNumber;
+    card_elem.question_title = question_title;
     question_container.appendChild(question_title);
-
-    REQUESTS.get_player_info(STATE.sessionID, function(response) {
-        question_title.innerHTML = "Level " + response["data"]["LEVEL"];
-
-        var question_title = response["data"]["questionTitle"];
-        if (question_title != "False") {
-            document.title = question_title;
-        };
-    })
 
 
     var content_region = document.createElement("div");
@@ -410,9 +406,6 @@ function create_question_card(response) {
         image_data_region.appendChild(image_url);
 
     };
-
-
-
 
 
     var submit_form = document.createElement("form");
@@ -471,6 +464,22 @@ function create_question_card(response) {
     //store it in STATE
     STATE.questioncard_obj = card_obj;
     STATE.questioncard_elem = card_elem;
+
+    REQUESTS.get_player_info(STATE.sessionID, function(response) {
+        var level_num_str = response["data"]["LEVEL"];
+        STATE.questioncard_elem.question_title.innerHTML = "Level " + level_num_str;
+
+        REQUESTS.get_question(STATE.sessionID, function(response_get_question) {
+            var question_title = response_get_question["data"]["questionTitle"];
+            if (question_title == "FALSE" || question_title == undefined) {
+                document.title = "CyberHawk";
+
+            } else {
+                document.title = question_title;
+            }
+        });
+    })
+
 
     return card_obj;
 
@@ -649,7 +658,7 @@ function create_profile_card() {
     var card_obj = create_css3d_obj(card_elem);
     card_obj.position.y = -1000;
     card_obj.position.x = +1000;
-    card_obj.position.z = -20;
+    card_obj.position.z = -40;
 
     card_obj.rotation.y = deg2rad(-5);
 
@@ -666,7 +675,6 @@ function create_profile_card() {
 function create_hints_card() {
     var card_elem = document.createElement("paper-material");
     card_elem.setAttribute("class", "card");
-    card_elem.setAttribute("style", "width: 25%; height: 80%");
 
     $(card_elem).click(function() {
         console.log("hints clicked");
@@ -705,7 +713,7 @@ function create_hints_card() {
     var card_obj = create_css3d_obj(card_elem);
     card_obj.position.y = -1000;
     card_obj.position.x = -300;
-    card_obj.position.z = -20;
+    card_obj.position.z = -40;
 
     card_obj.rotation.y = deg2rad(5);
 
@@ -735,8 +743,33 @@ function create_rules_card() {
     var rules_header = create_header("h1", "Rules");
     rules_container.appendChild(rules_header);
 
+
+    var rules_bullet;
+
+    rules_bullet = document.createElement("h3");
+    rules_bullet.innerHTML = "One account per user. Participants have to be a student of an Indian Institute."
+    rules_container.appendChild(rules_bullet);
+
+    rules_bullet = document.createElement("h3");
+    rules_bullet.innerHTML = "Multiple IDs, People playing in groups will be banned."
+    rules_container.appendChild(rules_bullet);
+
+    rules_bullet = document.createElement("h3");
+    rules_bullet.innerHTML = "The Hawk hates numerals, only alphabets"
+    rules_container.appendChild(rules_bullet);
+
+    rules_bullet = document.createElement("h3");
+    rules_bullet.innerHTML = "The Event Heads have the ultimate authority"
+    rules_container.appendChild(rules_bullet);
+
+    rules_bullet = document.createElement("h3");
+    rules_bullet.innerHTML = "The answer of '1 cake' will be 'onecake'";
+    rules_container.appendChild(rules_bullet);
+
+
+
     var card_obj = create_css3d_obj(card_elem);
-    card_obj.position.z = -20;
+    card_obj.position.z = -40;
     card_obj.position.y = -1000;
     card_obj.rotation.y = deg2rad(5);
 
@@ -1106,23 +1139,27 @@ var render = function(time) {
 console.log("polymer loaded!");
 
 
-window.onresize = function() {
-    GLOBALS.camera.aspectRatio = window.innerWidth / window.innerHeight;
-    GLOBALS.cssRenderer.setSize(window.innerWidth, window.innerHeight);
-
-
-    STATE.profile_card_obj.position.x = window.innerWidth * 0.4;
-    STATE.hints_card_obj.position.x = -window.innerWidth * 0.4;
-    STATE.rules_card_obj.position.x = -window.innerWidth * 0.4;
-
-    console.log("resized!");
-};
 
 
 setTimeout(function() {
     init();
     create_mouse_position_tracker();
     //create_gyro_position_tracker();
+
+    window.onresize = function() {
+        GLOBALS.camera.aspectRatio = window.innerWidth / window.innerHeight;
+        GLOBALS.cssRenderer.setSize(window.innerWidth, window.innerHeight);
+
+
+        STATE.profile_card_obj.position.x = 400;
+        STATE.hints_card_obj.position.x = -400;
+        STATE.rules_card_obj.position.x = -400;
+
+        console.log("resized!");
+    };
+
+
+
     window.onresize();
     render();
 }, 400);
@@ -1246,6 +1283,7 @@ label {
     /*
     color: #bfbfbf !important;
     */
+    font-size: 1.1em !important;
     color: #7AB2D9 !important;
 }
 
@@ -1337,7 +1375,8 @@ paper-toast {
     padding-bottom: 3em;
     padding-left: 3em;
     padding-right: 3em;
-    width: 250px;
+    width: 200px;
+    height: 600px;
 }
 
 .hint-region {
