@@ -14,6 +14,7 @@
 <!--script src="js/tweenjs.js"></script-->
 <script src="js/jquery.js"></script>
 <script src="js/tween-lib.js"></script>
+<script src="js/moment.js"></script>
 <script src="bower_components/webcomponentsjs/webcomponents-lite.min.js"></script>
 <link rel="import" href="bower_components/paper-button/paper-button.html">
 <link rel="import" href="bower_components/paper-input/paper-input.html">
@@ -171,7 +172,7 @@ var STATE = {
     try_login: function() {
         this.login_card_elem.login_button.disabled = true;
         this.login_card_elem.goto_register_button.disabled = true;
-        this.profile_card_elem.logout_button.disabled = false;
+        //this.profile_card_elem.logout_button.disabled = false;
         this.login_card_elem.login_progress.indeterminate = true;
     },
 
@@ -191,7 +192,7 @@ var STATE = {
         this.login_card_elem.login_progress.value = 0;
 
         //enable logout buttons
-        this.profile_card_elem.logout_button.disabled = false;
+        //this.profile_card_elem.logout_button.disabled = false;
     },
 
     try_register: function() {
@@ -271,6 +272,9 @@ var STATE = {
     },
 
     update_profile: function() {
+        //HUGE HUGE HACK vvvvvvvvvvv
+        return;
+
         REQUESTS.get_position(STATE.sessionID, function(response) {
             STATE.profile_card_elem.leadersTextRegion.innerHTML = response["data"]["leaders"];
             STATE.profile_card_elem.onParTextRegion.innerHTML = response["data"]["same"];
@@ -287,6 +291,9 @@ var STATE = {
     },
 
     update_hints: function() {
+        //HUGE HUGE HACK vvvvvvvvvvv
+        return;
+
         REQUESTS.get_hints(STATE.sessionID, function(response) {
             if (response["data"].length === 0) {
                 STATE.hints_card_elem.no_hints.style.display = "none";
@@ -526,20 +533,18 @@ function create_login_card(cssScene) {
                 console.log("response from login: ", response);
                 STATE.sessionID = response["data"]["sessionID"];
                 console.log("sessionID: ", STATE.sessionID);
+                STATE.switch_card_anim(STATE.teaser_card_obj);
 
+                /*
                 REQUESTS.get_question(STATE.sessionID, function(response) {
                     STATE.success_login();
                     //load the question
                     var question = response["data"]["questionText"];
                     var question_card = create_question_card(question);
-                    //switch
-                    STATE.switch_card_anim(question_card);
-                    STATE.show_profile();
-                    STATE.update_profile();
-                    STATE.show_hints();
-                    STATE.update_hints();
+                    //switch_card_anim
+                    STATE.switch_card_anim(STATE.teaser_card_obj);
 
-                });
+                });*/
 
             }
         });
@@ -722,6 +727,49 @@ function create_rules_card() {
     STATE.rules_card_obj = card_obj;
     STATE.rules_card_elem = card_elem;
 }
+
+function create_teaser_card() {
+    var card_paper = document.createElement("paper-card");
+    card_paper.setAttribute("elevation", "5");
+    card_paper.setAttribute("animatedShadow", "true");
+
+
+    var card_elem = document.createElement("div");
+    card_elem.setAttribute("class", "card");
+    card_elem.setAttribute("style", "padding: 5em");
+    card_paper.appendChild(card_elem);
+
+    var hello_header = document.createElement("h1");
+    hello_header.innerHTML = "Welcome to Cyberhawk";
+    card_elem.appendChild(hello_header);
+
+    var wait_for_it_header = document.createElement("h3");
+    wait_for_it_header.innerHTML = "";
+    wait_for_it_header.setAttribute("font-weight", 300);
+    card_elem.appendChild(wait_for_it_header);
+
+    function update_timer() {
+        var time_str = moment("2015107", "YYYYMMDD").fromNow();
+        wait_for_it_header.innerHTML = "Wait for the hawk to go online " + time_str;
+    }
+    update_timer();
+    setInterval(update_timer, 1000);
+
+
+    var card_obj = create_css3d_obj(card_elem);
+    GLOBALS.cssScene.add(card_obj);
+    card_obj.position.y = -2000;
+
+    //store it in STATE
+    STATE.teaser_card_obj = card_obj;
+    STATE.teaser_card_elem = card_elem;
+
+    //STATE.top_card = card_obj;
+
+    return card_obj;
+
+
+};
 
 function create_register_card() {
     var card_paper = document.createElement("paper-card");
@@ -908,10 +956,11 @@ function init() {
 
 
     create_register_card(cssScene);
+    create_teaser_card(cssScene);
     create_login_card(cssScene);
-    create_profile_card(cssScene);
-    create_hints_card(cssScene);
-    create_rules_card(cssScene);
+    //create_profile_card(cssScene);
+    //create_hints_card(cssScene);
+    //create_rules_card(cssScene);
 
     function make_register_slide_up() {
         STATE.register_card_obj.position.y = -2000;
@@ -1063,9 +1112,11 @@ window.onresize = function() {
     GLOBALS.cssRenderer.setSize(window.innerWidth, window.innerHeight);
 
 
-    STATE.profile_card_obj.position.x = window.innerWidth * 0.5;
-    STATE.hints_card_obj.position.x = -window.innerWidth * 0.5;
-    STATE.rules_card_obj.position.x = -window.innerWidth * 0.5;
+    /*
+    STATE.profile_card_obj.position.x = window.innerWidth * 0.4;
+    STATE.hints_card_obj.position.x = -window.innerWidth * 0.4;
+    STATE.rules_card_obj.position.x = -window.innerWidth * 0.4;
+    */
 
     console.log("resized!");
 };
