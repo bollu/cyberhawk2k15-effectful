@@ -8,22 +8,30 @@
 
 <body>
 </body>
+<link rel="import" href="bower_components/polymer/polymer.html">
+<script src="bower_components/webcomponentsjs/webcomponents.min.js"></script>
 <!-- script -->
 <script src="js/three.js"></script>
 <script src="js/three.css3drenderer.js"></script>
 <!--script src="js/tweenjs.js"></script-->
 <script src="js/jquery.js"></script>
 <script src="js/tween-lib.js"></script>
-<script src="bower_components/webcomponentsjs/webcomponents-lite.min.js"></script>
 <link rel="import" href="bower_components/paper-button/paper-button.html">
 <link rel="import" href="bower_components/paper-input/paper-input.html">
 <link rel="import" href="bower_components/paper-material/paper-material.html">
 <link rel="import" href="bower_components/paper-ripple/paper-ripple.html">
 <link rel="import" href="bower_components/paper-toast/paper-toast.html">
 <link rel="import" href="bower_components/paper-progress/paper-progress.html">
-<link rel="import" href="bower_components/polymer/polymer.html">
 <script>
 "use strict";
+
+/*
+HTMLImports.whenReady(function() {
+    Polymer({
+        is: 'x-element'
+    });
+});
+*/
 
 function deg2rad(degree) {
     return degree * Math.PI / 180.0;
@@ -475,13 +483,13 @@ function create_login_card(cssScene) {
     login_form.setAttribute("class", "login-container");
     card_elem.appendChild(login_form)
 
-    var header = create_header("h1", "Cyberhawk");
+    var header = create_header("h1", " CyberHawk");
     login_form.appendChild(header);
 
-    var email_input = create_input("E-mail id");
+    var email_input = create_input("E-MAIL");
     login_form.appendChild(email_input);
 
-    var password_input = create_input("password");
+    var password_input = create_input("PASSWORD");
     password_input.setAttribute("type", "password")
     login_form.appendChild(password_input);
 
@@ -632,7 +640,7 @@ function create_profile_card() {
     card_obj.position.x = +1000;
     card_obj.position.z = 5;
 
-    card_obj.rotation.x = deg2rad(30);
+    card_obj.rotation.y = deg2rad(30);
 
     GLOBALS.cssScene.add(card_obj);
 
@@ -748,29 +756,29 @@ function create_register_card() {
     register_form.appendChild(header);
 
 
-    var name_input = create_input("name");
+    var name_input = create_input("NAME");
     register_form.appendChild(name_input);
 
 
 
-    var password_input = create_input("password");
+    var password_input = create_input("PASSWORD");
     password_input.setAttribute("type", "password")
     register_form.appendChild(password_input);
 
-    var password_resubmit_input = create_input("retype password");
+    var password_resubmit_input = create_input("RETYPE PASSWORD");
     password_resubmit_input.setAttribute("type", "password")
     register_form.appendChild(password_resubmit_input);
 
 
-    var email_input = create_input("E-mail");
+    var email_input = create_input("E-MAIL");
     register_form.appendChild(email_input);
 
 
-    var phone_input = create_input("Phone number");
+    var phone_input = create_input("PHONE NUMBER");
     register_form.appendChild(phone_input);
 
 
-    var college_input = create_input("College");
+    var college_input = create_input("COLLEGE");
     register_form.appendChild(college_input);
 
     var hidden_submit = document.createElement("input");
@@ -882,7 +890,6 @@ function init() {
     var camera = null;
     var FOV_amount = is_mobile() ? 60 : 75;
     camera = new THREE.PerspectiveCamera(FOV_amount, window.innerWidth / window.innerHeight, 0.1, 1000);
-
     GLOBALS.camera = camera;
 
     camera.position.z = 500;
@@ -892,9 +899,27 @@ function init() {
     cssRenderer.setSize(window.innerWidth, window.innerHeight);
     cssRenderer.domElement.style.position = 'absolute';
     cssRenderer.domElement.style.top = 0;
+
     //cssRenderer.domElement.style.background = '#161928';
     //cssRenderer.domElement.style.background = '#EFEFEF';
     cssRenderer.domElement.style.background = '#243B4F';
+
+
+    /*
+    var canvas = cssRenderer.domElement;
+    context = canvas.getContext("2d");
+    img = new Image();
+
+    img.src = 'https://www.google.nl/images/srpr/logo3w.png';
+
+    img.onload = function() {
+        for (var w = 0; w < canvas.width; w += img.width) {
+            for (var h = 0; h < canvas.height; h += img.height) {
+                context.drawImage(img, w, h);
+            }
+        }
+    }
+    */
 
     document.body.appendChild(cssRenderer.domElement);
 
@@ -947,6 +972,8 @@ function init() {
         }, 60 * 1000);
     };
     setup_profile_reload();
+
+
 };
 
 
@@ -1042,6 +1069,7 @@ function create_gyro_position_tracker() {
         //GLOBALS.mousePos.y.move_by(50 * yVal);
     }
 };
+
 var render = function(time) {
     requestAnimationFrame(render);
     const ROTATE_FACTOR = 0.1;
@@ -1058,6 +1086,10 @@ var render = function(time) {
 };
 
 //onresize handler
+//window.addEventListener('polymer-ready', function(e) {
+console.log("polymer loaded!");
+
+
 window.onresize = function() {
     GLOBALS.camera.aspectRatio = window.innerWidth / window.innerHeight;
     GLOBALS.cssRenderer.setSize(window.innerWidth, window.innerHeight);
@@ -1070,16 +1102,19 @@ window.onresize = function() {
     console.log("resized!");
 };
 
-init();
-create_mouse_position_tracker();
-//create_gyro_position_tracker();
-window.onresize();
-render();
+
+setTimeout(function() {
+    init();
+    create_mouse_position_tracker();
+    //create_gyro_position_tracker();
+    window.onresize();
+    render();
+}, 400);
 </script>
 <!-- style -->
 <style type="text/css">
 @font-face {
-    font-family: 'Meslo LG S DZ';
+    font-family: 'Segoe UI';
     src: url('css/fonts/MesloLGSDZ.ttf');
     /* IE9 Compat Modes */
 }
@@ -1099,7 +1134,7 @@ render();
 body {
     margin: 0;
     padding: 0;
-    font-family: "Meslo LG S DZ", !important;
+    font-family: "Segoe UI" !important;
     font-weight: 200;
     overflow: hidden;
     width: 100%;
@@ -1181,6 +1216,7 @@ paper-button {
     background: #5ECBEE;
     background: #EFAC49;
     */
+    font-family: "Segoe UI" !important;
     background: #343A4F;
     color: #efefef;
     width: 100%;
@@ -1190,7 +1226,7 @@ paper-button {
 
 .paper-input,
 label {
-    font-family: "Meslo LG S DZ" !important;
+    font-family: "Segoe UI" !important;
     /*
     color: #bfbfbf !important;
     */
@@ -1203,7 +1239,7 @@ label {
 
 paper-input-container input,
 paper-input-container label {
-    font-family: "Meslo LG S DZ for Powerline" !important;
+    font-family: "Segoe UI" !important;
     color: #0000FF;
     --paper-input-container-focus-color: #0000FF;
 }
@@ -1267,7 +1303,7 @@ paper-toast {
 }
 
 .profile-leaderboard-val {
-    font-family: "Meslo LG S DZ" !important;
+    font-family: "Segoe UI" !important;
     color: #555555;
     font-weight: 300;
     margin-top: 0px;

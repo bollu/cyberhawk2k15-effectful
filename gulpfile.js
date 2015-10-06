@@ -42,7 +42,10 @@ gulp.task('css', function() {
             message: 'CSS built'
         }));
 
-    return merge(sass_styles, css_styles);
+
+    var images = gulp.src("./*.png").pipe(gulp.dest("dist/"));
+
+    return merge(sass_styles, css_styles, images);
 
 });
 
