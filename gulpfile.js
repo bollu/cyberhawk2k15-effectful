@@ -53,6 +53,7 @@ gulp.task('css', function() {
 gulp.task('js', function() {
 
     var js = gulp.src('src/js/**/*.js')
+        //.pipe(uglify())
         .pipe(gulp.dest('dist/js'))
         .pipe(notify({
             message: 'JS files built'
